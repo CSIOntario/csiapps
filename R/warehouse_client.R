@@ -10,15 +10,26 @@ WarehouseClientError <- function(msg) {
   structure(list(message = msg), class = c("WarehouseClientError", "error", "condition"))
 }
 
+#' Default configuration for Warehouse API client
+#'
+#' @param base_url the base URL for the Warehouse API
+#' @param ingest_path the path for the ingestion endpoint
+#' @param datasource_detail_pattern a pattern for datasource detail endpoint
+#' @param records_list_path the path for the data records endpoint
+#' @param timeout_s timeout for API requests in seconds
+#'
+#' @return A list containing the API configuration
+#' @export
+#'
 WarehouseAPIConfig <- function(
-    institute = "csipacific",
+    base_url = SITE_URL(),
     ingest_path = "/api/warehouse/ingestion/primary/",
     datasource_detail_pattern = "/api/warehouse/data-sources/%s/",
     records_list_path = "/api/warehouse/data-records/",
     timeout_s = 20L
 ) {
   list(
-    base_url = paste0("https://apps.", institute, ".ca"),
+    base_url = base_url,
     ingest_path = ingest_path,
     datasource_detail_pattern = datasource_detail_pattern,
     records_list_path = records_list_path,
@@ -26,6 +37,12 @@ WarehouseAPIConfig <- function(
   )
 }
 
+#' Create a Warehouse API client
+#'
+#' @param config Configuration list for API endpoints and settings. Defaults to `WarehouseAPIConfig()`.
+#'
+#' @return A list of functions for interacting with the Warehouse API
+#' @export
 new_warehouse_client <- function(config = WarehouseAPIConfig()) {
 
   get_auth_header <- function() {
