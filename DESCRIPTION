@@ -15,3 +15,5 @@ Imports:
     openssl,
     shiny,
     shinyjs
+URL: https://github.com/CSIOntario/csiapps
+BugReports: https://github.com/CSIOntario/csiapps/issues
