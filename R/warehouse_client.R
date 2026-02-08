@@ -1,7 +1,7 @@
 get_token <- function() {
-  tok <- Sys.getenv("CSI_ACCESS_TOKEN")
+  tok <- Sys.getenv("CSIAPPS_ACCESS_TOKEN")
   if (!nzchar(tok)) {
-    stop("No CSI_ACCESS_TOKEN set; user may not be authenticated.", call. = FALSE)
+    stop("No CSIAPPS_ACCESS_TOKEN set; user may not be authenticated.", call. = FALSE)
   }
   tok
 }

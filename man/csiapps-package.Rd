@@ -8,6 +8,14 @@
 \description{
 Helper functions and utilities for CSI data warehouse ingestion and shiny web applications.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/CSIOntario/csiapps}
+  \item Report bugs at \url{https://github.com/CSIOntario/csiapps/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: David Awosoga \email{dawosoga@csiontario.ca} (\href{https://orcid.org/0000-0002-2741-5770}{ORCID}) [copyright holder]
 

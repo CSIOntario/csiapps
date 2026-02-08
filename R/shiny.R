@@ -30,6 +30,159 @@ ui_wrapper <- function(...) {
   )
 }
 
+#' Wrapper server function for Shiny apps, handling OAuth2 PKCE authentication flow with CSI, managing user tokens and info, and providing a consistent authentication status UI.
+#'
+#' @param app_specific_logic Existing server logic of shiny web application
+#'
+#' @return A Shiny server function that wraps the provided app-specific logic with authentication handling and user info retrieval.
+#' @export
+server_wrapper <- function(app_specific_logic) {
+
+  function(input, output, session) {
+
+    user_token <- reactiveVal(NULL)
+    userinfo   <- reactiveVal(NULL)
+
+    # org / profile state
+    org_options_rv      <- reactiveVal(NULL)
+    profiles_rv         <- reactiveVal(NULL)
+    selected_profile_rv <- reactiveVal(NULL)
+
+    # ---------------- CSI OAuth2 PKCE flow ----------------
+
+    observe({
+      query <- parseQueryString(session$clientData$url_search)
+      code  <- query$code
+      state <- query$state
+      err   <- query$error
+      err_desc <- query$error_description
+
+      #message("DEBUG query: ", session$clientData$url_search)
+
+      if (!is.null(err)) {
+        #message("AUTH ERROR from provider: ", err, " - ", err_desc)
+        user_token(list(error = err, error_description = err_desc))
+        clear_token()
+        shinyjs::runjs("window.location.href = window.location.pathname;") # good enough fix
+        #return()
+      }
+
+      # 1) No code + no token -> redirect to CSI
+      if (is.null(code) && is.null(user_token())) {
+        pk <- httr2::oauth_flow_auth_code_pkce()
+        st <- pkce_state_encode(pk$verifier)
+
+        csi_client <- httr2::oauth_client(
+          id        = Sys.getenv("CSIAPPS_CLIENT_ID"),
+          token_url = Sys.getenv("CSIAPPS_TOKEN_URL"),
+          secret    = Sys.getenv("CSIAPPS_CLIENT_SECRET")
+        )
+
+        auth_url <- httr2::oauth_flow_auth_code_url(
+          client       = csi_client,
+          auth_url     = Sys.getenv("CSIAPPS_AUTH_URL"),
+          redirect_uri = Sys.getenv("CSIAPPS_REDIRECT_URI"),
+          scope        = Sys.getenv("CSIAPPS_SCOPE", "read write"),
+          auth_params  = list(
+            code_challenge        = pk$challenge,
+            code_challenge_method = pk$method,
+            state                 = st
+          )
+        )
+
+        #message("DEBUG login_url: ", auth_url)
+        session$sendCustomMessage("csip_redirect", auth_url) # not sure what this does
+        return()
+      }
+
+      # 2) Have code but no token yet -> exchange
+      if (!is.null(code) && is.null(user_token())) {
+        verifier <- NULL
+        if (!is.null(state)) {
+          decoded <- pkce_state_decode(state)
+          verifier <- decoded$v
+        }
+        token <- exchange_code_for_token(code, code_verifier = verifier)
+        #message("DEBUG token payload:"); utils::str(token)
+        #print(token)
+        user_token(token)
+      }
+    })
+
+    # Load /me and update global access token when we get a token
+    observeEvent(user_token(), {
+      tok <- user_token()
+
+      # Clear any old token
+      Sys.unsetenv("CSIAPPS_ACCESS_TOKEN")
+
+      # Bail if token exchange failed
+      if (is.null(tok) || !is.null(tok$error)) {
+        #return()
+        shinyjs::runjs("window.location.href = window.location.pathname;") # good enough fix
+      }
+
+      access_token <- tok$access_token
+
+      if (is.null(access_token) || !nzchar(access_token)) return()
+
+      # 1) Make token available globally (Warehouse + helpers)
+      Sys.setenv(CSIAPPS_ACCESS_TOKEN = access_token)
+
+      # 2) Load /me for first_name / last_name (for header)
+      if (!is.null(Sys.getenv("CSIAPPS_USERINFO_URL")) && nzchar(Sys.getenv("CSIAPPS_USERINFO_URL"))) {
+        req <- httr2::request(Sys.getenv("CSIAPPS_USERINFO_URL")) |>
+          httr2::req_auth_bearer_token(access_token)
+        resp  <- httr2::req_perform(req)
+        ui_me <- httr2::resp_body_json(resp, simplifyVector = TRUE)
+        userinfo(ui_me)
+      }
+
+    })
+
+    # Auth status UI: first/last name + logout
+    output$auth_status <- renderUI({
+      tok <- user_token()
+
+      if (is.null(tok)) {
+        return(tags$p("Redirecting to APPS for authentication..."))
+      }
+
+      if (!is.null(tok$error)) {
+        return(tagList(
+          tags$p("Authentication error (see logs).")
+        ))
+      }
+
+      ui_me <- userinfo()
+      name_text <- if (!is.null(ui_me$first_name) && !is.null(ui_me$last_name)) {
+        sprintf("Signed in as %s %s", ui_me$first_name, ui_me$last_name)
+      } else {
+        "Signed in"
+      }
+
+      tagList(
+        br(),
+        br(),
+        br(),
+        tags$p(name_text),
+        actionButton("logout", "Log out")
+      )
+    })
+
+    observeEvent(input$logout, {
+      user_token(NULL)
+      userinfo(NULL)
+      clear_token()
+      #session$reload()
+      shinyjs::runjs("window.location.href = window.location.pathname;") # good enough fix
+    })
+
+    eval(body(app_specific_logic), envir = environment())
+
+  }
+}
+
 # -------------------------------------------------------------------
 # Navbar, footer, profile card, tabs
 # -------------------------------------------------------------------
