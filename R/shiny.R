@@ -164,7 +164,6 @@ server_wrapper <- function(app_specific_logic) {
       tagList(
         br(),
         br(),
-        br(),
         tags$p(name_text),
         actionButton("logout", "Log out")
       )

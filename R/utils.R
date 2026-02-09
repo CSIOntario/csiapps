@@ -37,14 +37,18 @@ clear_token <- function() {
 
 #' Function to check that required environment variables for APPS authentication are set and valid
 #'
+#' @param verbose logical; if TRUE, prints the current values of relevant environment variables (masking secrets) to the console
+#'
 #' @export
-check_secrets <- function() {
+check_secrets <- function(verbose = F) {
 
   bad <- character()
   if (!grepl("^https?://", Sys.getenv("CSIAPPS_AUTH_URL")))      bad <- c(bad, "CSIAPPS_AUTH_URL")
   if (!grepl("^https?://", Sys.getenv("CSIAPPS_TOKEN_URL")))     bad <- c(bad, "CSIAPPS_TOKEN_URL")
   if (!grepl("^https?://", Sys.getenv("CSIAPPS_REDIRECT_URI")))  bad <- c(bad, "CSIAPPS_REDIRECT_URI")
   if (length(bad) > 0) stop("Invalid or missing URL env vars: ", paste(bad, collapse = ", "))
+
+  if (verbose) {
 
     message("AUTH_URL: '", Sys.getenv("CSIAPPS_AUTH_URL"), "'  REDIRECT_URI: '", Sys.getenv("CSIAPPS_REDIRECT_URI"), "'")
 
@@ -59,6 +63,7 @@ check_secrets <- function() {
     )
     message("CSIAPPS environment on startup:")
     utils::str(env_dump)
+  }
 }
 
 # -------------------------------------------------------------------
