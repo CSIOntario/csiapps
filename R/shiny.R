@@ -1,3 +1,19 @@
+
+#' Wrapper function to allow for global variable assignment and function definitions accessible by the server function
+#'
+#' @param code A block of R code
+#'
+#' @return The result of evaluating the code block in the Global Environment
+#' @export
+global_wrapper <- function(code) {
+  # Capture the code block passed in (...)
+  expr <- substitute(code)
+
+  # Evaluate it specifically in the Global Environment
+  eval(expr, envir = .GlobalEnv)
+}
+
+
 #' Wrapper UI for all Shiny apps, providing a consistent navbar and footer, and handling authentication status display.
 #'
 #' @param ... Additional UI elements to include in the main content area
@@ -162,8 +178,8 @@ server_wrapper <- function(app_specific_logic) {
       }
 
       tagList(
-        br(),
-        br(),
+        #br(),
+        #br(),
         tags$p(name_text),
         actionButton("logout", "Log out")
       )

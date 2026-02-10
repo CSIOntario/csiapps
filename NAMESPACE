@@ -2,6 +2,7 @@
 
 export(WarehouseAPIConfig)
 export(check_secrets)
+export(global_wrapper)
 export(new_warehouse_client)
 export(server_wrapper)
 export(set_institute)
