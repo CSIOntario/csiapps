@@ -180,8 +180,8 @@ server_wrapper <- function(app_specific_logic) {
       tagList(
         #br(),
         br(),
-        tags$p(name_text),
-        actionButton("logout", "Log out")
+        tags$p(name_text)
+        #actionButton("logout", "Log out")
       )
     })
 
