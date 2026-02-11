@@ -22,13 +22,9 @@ The following environment variables must be set to use the package:
   CSIAPPS.
 - `CSIAPPS_CLIENT_SECRET`: The client secret for the application
   registered in CSIAPPS.
-- `CSIAPPS_AUTH_URL`: The URL for the authentication endpoint of the
-  API.
-- `CSIAPPS_TOKEN_URL`: The URL for the token endpoint of the API.
 - `CSIAPPS_REDIRECT_URL`: The URL to which the API will redirect after
   authentication.
-- `CSIAPPS_USERINFO_URL`: The URL for the user info endpoint of the API.
-- `CSIAPPS_SCOPE`: The scope of the authentication request.
+- `CSIAPPS_SCOPE`: (optional) The scope of the authentication request.
 
 ## Usage
 
@@ -36,5 +32,6 @@ The following environment variables must be set to use the package:
 # check_secrets()
 # ui_wrapper
 # token_wrapper
+# global_wrapper
 # should I just make a vignette?
 ```

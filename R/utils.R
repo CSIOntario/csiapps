@@ -2,10 +2,14 @@
 # ---- CSI APPS/Warehouse constants ----
 SPORT_ORG_ENDPOINT <- "/api/registration/organization/"
 PROFILE_ENDPOINT <- "/api/registration/profile/"
+
+# environment variables
 package_state <- new.env(parent = emptyenv())
 package_state$INSTITUTE <- "csipacific"
-
 SITE_URL <- function() paste0("https://apps.", package_state$INSTITUTE, ".ca")
+CSIAPPS_AUTH_URL <- function() paste0(SITE_URL(), "/o/authorize/")
+CSIAPPS_TOKEN_URL <- function() paste0(SITE_URL(), "/o/token/")
+CSIAPPS_USERINFO_URL <- function() paste0(SITE_URL(), "/api/csiauth/me")
 
 #' Set the target institute for API calls
 #'
@@ -17,18 +21,6 @@ set_institute <- function(institute = "csipacific") {
             institute %in% c("csipacific", "csiontario"))
 
   package_state$INSTITUTE <- institute
-
-  Sys.setenv(CSIAPPS_AUTH_URL = gsub(Sys.getenv("CSIAPPS_AUTH_URL"),
-                                 pattern = "csipacific|csiontario",
-                                 replacement = institute))
-
-  Sys.setenv(CSIAPPS_TOKEN_URL = gsub(Sys.getenv("CSIAPPS_TOKEN_URL"),
-                                 pattern = "csipacific|csiontario",
-                                 replacement = institute))
-
-  Sys.setenv(CSIAPPS_USERINFO_URL = gsub(Sys.getenv("CSIAPPS_USERINFO_URL"),
-                                 pattern = "csipacific|csiontario",
-                                 replacement = institute))
 }
 
 clear_token <- function() {
@@ -43,23 +35,23 @@ clear_token <- function() {
 check_secrets <- function(verbose = F) {
 
   bad <- character()
-  if (!grepl("^https?://", Sys.getenv("CSIAPPS_AUTH_URL")))      bad <- c(bad, "CSIAPPS_AUTH_URL")
-  if (!grepl("^https?://", Sys.getenv("CSIAPPS_TOKEN_URL")))     bad <- c(bad, "CSIAPPS_TOKEN_URL")
+  if (!grepl("^https?://", CSIAPPS_AUTH_URL()))      bad <- c(bad, "CSIAPPS_AUTH_URL")
+  if (!grepl("^https?://", CSIAPPS_TOKEN_URL()))     bad <- c(bad, "CSIAPPS_TOKEN_URL")
   if (!grepl("^https?://", Sys.getenv("CSIAPPS_REDIRECT_URI")))  bad <- c(bad, "CSIAPPS_REDIRECT_URI")
   if (length(bad) > 0) stop("Invalid or missing URL env vars: ", paste(bad, collapse = ", "))
 
   if (verbose) {
 
-    message("AUTH_URL: '", Sys.getenv("CSIAPPS_AUTH_URL"), "'  REDIRECT_URI: '", Sys.getenv("CSIAPPS_REDIRECT_URI"), "'")
+    message("AUTH_URL: '", CSIAPPS_AUTH_URL(), "'  REDIRECT_URI: '", Sys.getenv("CSIAPPS_REDIRECT_URI"), "'")
 
     env_dump <- list(
       CSIAPPS_CLIENT_ID          = Sys.getenv("CSIAPPS_CLIENT_ID"),
       CSIAPPS_CLIENT_SECRET_SET  = nzchar(Sys.getenv("CSIAPPS_CLIENT_SECRET")),
-      CSIAPPS_AUTH_URL           = Sys.getenv("CSIAPPS_AUTH_URL"),
-      CSIAPPS_TOKEN_URL          = Sys.getenv("CSIAPPS_TOKEN_URL"),
+      CSIAPPS_AUTH_URL           = CSIAPPS_AUTH_URL(),
+      CSIAPPS_TOKEN_URL          = CSIAPPS_TOKEN_URL(),
       CSIAPPS_REDIRECT_URI       = Sys.getenv("CSIAPPS_REDIRECT_URI"),
       CSIAPPS_SCOPE              = Sys.getenv("CSIAPPS_SCOPE", "read write"),
-      CSIAPPS_USERINFO_URL       = Sys.getenv("CSIAPPS_USERINFO_URL")
+      CSIAPPS_USERINFO_URL       = CSIAPPS_USERINFO_URL()
     )
     message("CSIAPPS environment on startup:")
     utils::str(env_dump)
@@ -145,7 +137,7 @@ fetch_profile_api <- function(token = NULL, profile_id) {
   }
 
   path <- sprintf("%s%s", PROFILE_ENDPOINT, profile_id)  # "/api/registration/profile/{id}"
-  url  <- paste0(SITE_URL, path)
+  url  <- paste0(SITE_URL(), path)
 
   req <- httr2::request(url) |>
     httr2::req_headers(
@@ -209,7 +201,7 @@ pkce_state_decode <- function(state) {
 # -------------------------------------------------------------------
 
 exchange_code_for_token <- function(code, code_verifier = NULL) {
-  req <- httr2::request(Sys.getenv("CSIAPPS_TOKEN_URL")) |>
+  req <- httr2::request(CSIAPPS_TOKEN_URL()) |>
     httr2::req_auth_basic(Sys.getenv("CSIAPPS_CLIENT_ID"), Sys.getenv("CSIAPPS_CLIENT_SECRET")) |>
     httr2::req_body_form(
       grant_type    = "authorization_code",

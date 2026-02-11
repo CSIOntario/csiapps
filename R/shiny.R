@@ -90,13 +90,13 @@ server_wrapper <- function(app_specific_logic) {
 
         csi_client <- httr2::oauth_client(
           id        = Sys.getenv("CSIAPPS_CLIENT_ID"),
-          token_url = Sys.getenv("CSIAPPS_TOKEN_URL"),
+          token_url = CSIAPPS_TOKEN_URL(),
           secret    = Sys.getenv("CSIAPPS_CLIENT_SECRET")
         )
 
         auth_url <- httr2::oauth_flow_auth_code_url(
           client       = csi_client,
-          auth_url     = Sys.getenv("CSIAPPS_AUTH_URL"),
+          auth_url     = CSIAPPS_AUTH_URL(),
           redirect_uri = Sys.getenv("CSIAPPS_REDIRECT_URI"),
           scope        = Sys.getenv("CSIAPPS_SCOPE", "read write"),
           auth_params  = list(
@@ -146,8 +146,8 @@ server_wrapper <- function(app_specific_logic) {
       Sys.setenv(CSIAPPS_ACCESS_TOKEN = access_token)
 
       # 2) Load /me for first_name / last_name (for header)
-      if (!is.null(Sys.getenv("CSIAPPS_USERINFO_URL")) && nzchar(Sys.getenv("CSIAPPS_USERINFO_URL"))) {
-        req <- httr2::request(Sys.getenv("CSIAPPS_USERINFO_URL")) |>
+      if (!is.null(CSIAPPS_USERINFO_URL()) && nzchar(CSIAPPS_USERINFO_URL())) {
+        req <- httr2::request(CSIAPPS_USERINFO_URL()) |>
           httr2::req_auth_bearer_token(access_token)
         resp  <- httr2::req_perform(req)
         ui_me <- httr2::resp_body_json(resp, simplifyVector = TRUE)
@@ -179,7 +179,7 @@ server_wrapper <- function(app_specific_logic) {
 
       tagList(
         #br(),
-        #br(),
+        br(),
         tags$p(name_text),
         actionButton("logout", "Log out")
       )
