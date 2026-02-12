@@ -4,8 +4,10 @@
 \name{csiapps-package}
 \alias{csiapps}
 \alias{csiapps-package}
-\title{csiapps: Helper functions for CSI apps}
+\title{csiapps: Helper functions for CSIAPPS}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Helper functions and utilities for CSI data warehouse ingestion and shiny web applications.
 }
 \seealso{

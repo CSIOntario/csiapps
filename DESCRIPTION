@@ -1,5 +1,5 @@
 Package: csiapps
-Title: Helper functions for CSI apps
+Title: Helper functions for CSIAPPS
 Version: 0.0.0.9000
 Authors@R: 
     person("David", "Awosoga", , "dawosoga@csiontario.ca", role = c("aut", "cre", "cph"),
