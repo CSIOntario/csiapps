@@ -61,8 +61,6 @@ server_wrapper <- function(app_specific_logic) {
 
     # org / profile state
     org_options_rv      <- reactiveVal(NULL)
-    profiles_rv         <- reactiveVal(NULL)
-    selected_profile_rv <- reactiveVal(NULL)
 
     # ---------------- CSI OAuth2 PKCE flow ----------------
 
@@ -154,6 +152,19 @@ server_wrapper <- function(app_specific_logic) {
         userinfo(ui_me)
       }
 
+      # 3) Load organization list *here* (no separate observer)
+      org_opts <- tryCatch(
+        fetch_org_options(access_token),  # pass explicit token, no race
+        error = function(e) {
+          showNotification(
+            paste("Error loading organizations:", conditionMessage(e)),
+            type = "error"
+          )
+          NULL
+        }
+      )
+      org_options_rv(org_opts)
+
     })
 
     # Auth status UI: first/last name + logout
@@ -161,7 +172,7 @@ server_wrapper <- function(app_specific_logic) {
       tok <- user_token()
 
       if (is.null(tok)) {
-        return(tags$p("Redirecting to APPS for authentication..."))
+        return(tags$p("Redirecting to CSIAPPS for authentication..."))
       }
 
       if (!is.null(tok$error)) {

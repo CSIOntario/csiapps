@@ -191,6 +191,44 @@ new_warehouse_client <- function(config = WarehouseAPIConfig()) {
     results
   }
 
+
+  update_record <- function(record_id,
+                            updated_data,
+                            verbose = FALSE
+                            ) {
+    url <- paste0(config$base_url, config$records_list_path, record_id, "/")
+
+    req <- httr2::request(url) |>
+      httr2::req_headers(
+        Authorization = get_auth_header(),
+        Accept        = "application/json"
+      ) |>
+      httr2::req_body_json(list(data = updated_data)) |>
+      httr2::req_method("PATCH") |>
+      httr2::req_timeout(config$timeout_s)
+
+    resp   <- httr2::req_perform(req)
+    status <- httr2::resp_status(resp)
+    txt    <- httr2::resp_body_string(resp)
+
+    if(verbose) {
+      cat("Warehouse record PATCH", url, "status:", status, "\n")
+      cat("  updates:", jsonlite::toJSON(updated_data, auto_unbox = TRUE), "\n")
+      cat("  response:", txt, "\n")
+    }
+
+    if (status >= 400) {
+      stop(WarehouseClientError(paste("Update failed with status", status, ":", txt)))
+    }
+
+    tryCatch(
+      jsonlite::fromJSON(txt, simplifyVector = TRUE),
+      error = function(e) {
+        stop(WarehouseClientError(paste("Response not valid JSON:", e$message)))
+      }
+    )
+  }
+
   list(
     config       = config,
     ingest_raw   = ingest_raw,

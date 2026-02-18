@@ -62,6 +62,12 @@ check_secrets <- function(verbose = F) {
 # Registration API helpers
 # -------------------------------------------------------------------
 
+#' Flatten a registration record into a simpler structure for analysis
+#'
+#' @param rec a data record object as returned by the warehouse API endpoints
+#'
+#' @return a list with flattened fields for easier analysis, including
+#' @export
 flatten_record <- function(rec) {
   data <- rec$data %||% list()
 
@@ -84,6 +90,52 @@ flatten_record <- function(rec) {
     sport          = rec$subject$sport$name %||% NA,
     data           = data
   )
+}
+
+fetch_org_options <- function(token = NULL) {
+  # token arg is optional; default to env
+  if (is.null(token) || !nzchar(token)) {
+    token <- Sys.getenv("CSIAPPS_ACCESS_TOKEN")
+  }
+  if (!nzchar(token)) {
+    stop("fetch_org_options: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
+  }
+
+  url <- paste0(SITE_URL(), SPORT_ORG_ENDPOINT)  # "/api/registration/organization/"
+
+  req <- httr2::request(url) |>
+    httr2::req_headers(
+      Authorization = paste("Bearer", token),
+      Accept        = "application/json"
+    ) |>
+    httr2::req_url_query(limit = 1000L)
+
+  resp   <- httr2::req_perform(req)
+  status <- httr2::resp_status(resp)
+  txt    <- httr2::resp_body_string(resp)
+
+  if (status >= 400) {
+    stop(sprintf("fetch_org_options failed (%s): %s", status, txt))
+  }
+
+  items <- jsonlite::fromJSON(txt, simplifyVector = FALSE)
+
+  if (!is.null(items$results)) {
+    rv <- lapply(items$results, function(item) {
+      list(
+        label = item$name,
+        value = item$id
+      )
+    })
+  } else if (is.list(items)) {
+    rv <- lapply(items, function(val) {
+      list(label = val, value = val)
+    })
+  } else {
+    rv <- list()
+  }
+
+  rv
 }
 
 fetch_profiles_api <- function(token = NULL, filters = list()) {
