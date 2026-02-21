@@ -12,3 +12,4 @@ pkce_state_encode(verifier)
 \description{
 Encode a PKCE code verifier into a state string for the auth request
 }
+\keyword{internal}

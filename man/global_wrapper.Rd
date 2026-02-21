@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny.R
 \name{global_wrapper}
 \alias{global_wrapper}
-\title{Wrapper function to allow for global variable assignment and function definitions accessible by the server function}
+\title{Wrap Global code for Shiny apps}
 \usage{
 global_wrapper(code)
 }
@@ -13,5 +13,5 @@ global_wrapper(code)
 The result of evaluating the code block in the Global Environment
 }
 \description{
-Wrapper function to allow for global variable assignment and function definitions accessible by the server function
+Allows for global variable assignment and function definitions to be accessible by the server function.
 }

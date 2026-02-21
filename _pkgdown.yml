@@ -1,0 +1,25 @@
+url: https://csiontario.github.io/csiapps/
+template:
+  bootstrap: 5
+reference:
+- title: Functions
+- subtitle: Shiny
+  desc: |
+    Convenience wrappers developing Shiny web applications.
+  contents:
+  - ui_wrapper
+  - server_wrapper
+  - global_wrapper
+- subtitle: Utility
+  desc: |
+    Functions for interfacing with the CSIAPPS REST API.
+  contents:
+  - check_secrets
+  - set_institute
+- subtitle: Warehouse
+  desc: |
+    Functions for interfacing with the CSIAPPS data warehouse.
+  contents:
+  - new_warehouse_client
+  - flatten_record
+

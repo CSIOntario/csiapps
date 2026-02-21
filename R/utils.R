@@ -16,6 +16,8 @@ CSIAPPS_USERINFO_URL <- function() paste0(SITE_URL(), "/api/csiauth/me")
 #' @param institute One of "csipacific" or "csiontario"
 #'
 #' @export
+#' @examples
+#' set_institute("csiontario")
 set_institute <- function(institute = "csipacific") {
   stopifnot(is.character(institute), length(institute) == 1, nzchar(institute),
             institute %in% c("csipacific", "csiontario"))
@@ -62,11 +64,12 @@ check_secrets <- function(verbose = F) {
 # Registration API helpers
 # -------------------------------------------------------------------
 
-#' Flatten a registration record into a simpler structure for analysis
+#' Flatten a record object into a simpler structure
 #'
 #' @param rec a data record object as returned by the warehouse API endpoints
 #'
 #' @return a list with flattened fields for easier analysis, including
+#' `id`, `dataset_uuid`, `profile` (subject name), `created_at`, `updated_at`, `sport`, and `data` (original data payload)
 #' @export
 flatten_record <- function(rec) {
   data <- rec$data %||% list()
@@ -223,6 +226,7 @@ pkce_base64url <- function(raw_bytes) {
 #'
 #' @param verifier a PKCE code verifier string
 #' @importFrom stats runif
+#' @keywords internal
 #'
 pkce_state_encode <- function(verifier) {
   payload <- jsonlite::toJSON(

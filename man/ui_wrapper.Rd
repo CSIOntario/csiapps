@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny.R
 \name{ui_wrapper}
 \alias{ui_wrapper}
-\title{Wrapper UI for all Shiny apps, providing a consistent navbar and footer, and handling authentication status display.}
+\title{Wrapper UI for Shiny apps}
 \usage{
 ui_wrapper(...)
 }
@@ -13,5 +13,5 @@ ui_wrapper(...)
 A Shiny UI object with a navbar, footer, and main content area
 }
 \description{
-Wrapper UI for all Shiny apps, providing a consistent navbar and footer, and handling authentication status display.
+Provides a consistent navbar and footer, and handles authentication redirects.
 }

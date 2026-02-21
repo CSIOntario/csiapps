@@ -2,7 +2,7 @@
 % Please edit documentation in R/shiny.R
 \name{server_wrapper}
 \alias{server_wrapper}
-\title{Wrapper server function for Shiny apps, handling OAuth2 PKCE authentication flow with CSI, managing user tokens and info, and providing a consistent authentication status UI.}
+\title{Wrapper server function for Shiny apps}
 \usage{
 server_wrapper(app_specific_logic)
 }
@@ -13,5 +13,5 @@ server_wrapper(app_specific_logic)
 A Shiny server function that wraps the provided app-specific logic with authentication handling and user info retrieval.
 }
 \description{
-Wrapper server function for Shiny apps, handling OAuth2 PKCE authentication flow with CSI, managing user tokens and info, and providing a consistent authentication status UI.
+Handles OAuth2 PKCE authentication flow with CSIAPPS, managing user tokens and info, and providing a consistent authentication status UI.
 }

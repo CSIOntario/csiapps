@@ -29,3 +29,4 @@ A list containing the API configuration
 \description{
 Default configuration for Warehouse API client
 }
+\keyword{internal}

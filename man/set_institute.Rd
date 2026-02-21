@@ -12,3 +12,6 @@ set_institute(institute = "csipacific")
 \description{
 Set the target institute for API calls
 }
+\examples{
+set_institute("csiontario")
+}

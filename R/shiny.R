@@ -1,5 +1,7 @@
 
-#' Wrapper function to allow for global variable assignment and function definitions accessible by the server function
+#' Wrap Global code for Shiny apps
+#'
+#' Allows for global variable assignment and function definitions to be accessible by the server function.
 #'
 #' @param code A block of R code
 #'
@@ -14,7 +16,9 @@ global_wrapper <- function(code) {
 }
 
 
-#' Wrapper UI for all Shiny apps, providing a consistent navbar and footer, and handling authentication status display.
+#' Wrapper UI for Shiny apps
+#'
+#' Provides a consistent navbar and footer, and handles authentication redirects.
 #'
 #' @param ... Additional UI elements to include in the main content area
 #'
@@ -46,7 +50,9 @@ ui_wrapper <- function(...) {
   )
 }
 
-#' Wrapper server function for Shiny apps, handling OAuth2 PKCE authentication flow with CSI, managing user tokens and info, and providing a consistent authentication status UI.
+#' Wrapper server function for Shiny apps
+#'
+#' Handles OAuth2 PKCE authentication flow with CSIAPPS, managing user tokens and info, and providing a consistent authentication status UI.
 #'
 #' @param app_specific_logic Existing server logic of shiny web application
 #'

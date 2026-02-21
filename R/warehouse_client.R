@@ -17,6 +17,7 @@ WarehouseClientError <- function(msg) {
 #' @param datasource_detail_pattern a pattern for datasource detail endpoint
 #' @param records_list_path the path for the data records endpoint
 #' @param timeout_s timeout for API requests in seconds
+#' @keywords internal
 #'
 #' @return A list containing the API configuration
 #' @export
