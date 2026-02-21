@@ -1,0 +1,223 @@
+# Introduction to CSIAPPS
+
+## Developing Shiny Web Applications
+
+### Example
+
+Suppose that you have the following shiny web application:
+
+``` r
+library(shiny)
+
+df = faithful[, 2]
+
+ui <- fluidPage(
+
+    titlePanel("Old Faithful Geyser Data"),
+
+    sidebarLayout(
+        sidebarPanel(
+            sliderInput("bins",
+                        "Number of bins:",
+                        min = 1,
+                        max = 50,
+                        value = 30)
+        ),
+
+        mainPanel(
+           plotOutput("distPlot")
+        )
+    )
+)
+
+server <- function(input, output) {
+
+    output$distPlot <- renderPlot({
+        bins <- seq(min(df), max(df), length.out = input$bins + 1)
+
+        hist(df, breaks = bins, col = 'darkgray', border = 'white',
+             xlab = 'Waiting time to next eruption (in mins)',
+             main = 'Histogram of waiting times')
+    })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+### Process
+
+To migrate this app within the `CSIAPPS` ecosystem, we can leverage
+several functions provided by `csiapps`.
+
+1.  We specify which institute internal API calls should be made for
+    (such as authentication redirects) by the application using
+    [`set_institute()`](https://csiontario.github.io/csiapps/reference/set_institute.md).
+
+``` r
+# institute can be set to one of "csiontario" or "csipacific"
+csiapps::set_institute("csiontario")
+```
+
+2.  We then run
+    [`check_secrets()`](https://csiontario.github.io/csiapps/reference/check_secrets.md)
+    to ensure that all environment variables required have been set. The
+    `verbose` argument, which is `FALSE` by default, can be set to
+    `TRUE` to print out the values of the environment variables that are
+    being checked.
+    [`check_secrets()`](https://csiontario.github.io/csiapps/reference/check_secrets.md)
+    will throw an error if any of the required environment variables are
+    not present, making it useful for debugging.
+
+``` r
+csiapps::check_secrets(verbose = FALSE)
+```
+
+3.  In the application, for code defined outside but used within the
+    `server` function, we use
+    [`global_wrapper()`](https://csiontario.github.io/csiapps/reference/global_wrapper.md)
+    to ensure that it is accessible by internal `csiapps` functions.
+
+``` r
+csiapps::global_wrapper({
+  df = faithful[, 2]
+})
+```
+
+4.  For the `ui`, it can simply be wrapped within
+    [`ui_wrapper()`](https://csiontario.github.io/csiapps/reference/ui_wrapper.md),
+    which includes additional code to redirect the app to CSIAPPS for
+    user authentication and aesthetic formatting. The same principle
+    applies to the `server` function, which can be wrapped within
+    [`server_wrapper()`](https://csiontario.github.io/csiapps/reference/server_wrapper.md).
+
+``` r
+# original code
+
+ui <- ...
+
+server <- ...
+
+shinyApp(ui = ui, server = server)
+
+# wrapped code
+
+shinyApp(ui = csiapps::ui_wrapper(ui), server = csiapps::server_wrapper(server))
+```
+
+Thefore, the full code for the app, after migration, would look like
+this:
+
+``` r
+library(shiny)
+library(csiapps)
+
+# CSIAPPS Setup
+set_institute("csiontario")
+check_secrets()
+
+global_wrapper({
+  df = faithful[, 2]
+})
+
+# Define UI for application that draws a histogram
+ui <- fluidPage(
+
+    titlePanel("Old Faithful Geyser Data"),
+
+    sidebarLayout(
+        sidebarPanel(
+            sliderInput("bins",
+                        "Number of bins:",
+                        min = 1,
+                        max = 50,
+                        value = 30)
+        ),
+
+        mainPanel(
+           plotOutput("distPlot")
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+
+    output$distPlot <- renderPlot({
+        bins <- seq(min(df), max(df), length.out = input$bins + 1)
+
+        # draw the histogram with the specified number of bins
+        hist(df, breaks = bins, col = 'darkgray', border = 'white',
+             xlab = 'Waiting time to next eruption (in mins)',
+             main = 'Histogram of waiting times')
+    })
+}
+
+# Run the application 
+shinyApp(ui = ui_wrapper(ui), server = server_wrapper(server))
+```
+
+## Interfacing with the CSIAPPS REST API
+
+`csiapps` includes several functions to make API calls to the `CSIAPPS`
+data warehouse while abstracting away the underlying HTTP requests.
+
+We first generate a warehouse client object using
+[`new_warehouse_client()`](https://csiontario.github.io/csiapps/reference/new_warehouse_client.md).
+
+``` r
+wc <- csiapps::new_warehouse_client()
+```
+
+### `ingest_raw()`
+
+To ingest raw data into the warehouse, `ingest_raw()`, which is a
+convenience wrapper for the `/api/warehouse/ingestion/primary/`
+endpoint, can be used. It requires the `SOURCE_UUID` of the target
+table, a list of `records` to be ingested, the `subject_field` by which
+the record can be uniquely identified. The records must comply with the
+schema defined for the target table.
+
+``` r
+wc$ingest_raw(
+  source_uuid = Sys.getenv("SOURCE_UUID"),
+  records = list(
+    list(id = "xxxx", ...),
+    list(id = "yyyy", ...),
+    ...
+  ),
+  subject_field = "id"
+)
+```
+
+### `list_records()`
+
+To retrieve data from the warehouse, `list_records()`, a convenience
+wrapper for the `/api/warehouse/data-records/` endpoint, can be used. It
+requires the `SOURCE_UUID` of the requested table and also includes
+several optional parameters for filtering and pagination.
+
+``` r
+records <- wc$list_records(
+  source_uuid = "SOURCE_UUID", 
+  collected_after = Sys.Date() - 30,
+  collected_before = Sys.Date(),
+  extra_params = list(role = "primary")
+  )
+```
+
+After retrieving records,
+[`flatten_record()`](https://csiontario.github.io/csiapps/reference/flatten_record.md)
+can be used to flatten nested records into a more tabular format for
+easier analysis. It retains the original `data` payload and also
+includes additional metadata fields such as the unique `id`, the
+timestamp of when the record was collected, and any other relevant
+information.
+
+``` r
+flat_records <- lapply(records, flatten_record)
+```
+
+To use native HTTP requests for more customized interactions with the
+API, please refer to the Swagger documentation, which can be found at
+<https://apps.csiontario.ca/api/swagger/>. It includes details on the
+available endpoints, request parameters, and response formats.
