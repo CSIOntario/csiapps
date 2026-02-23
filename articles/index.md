@@ -2,5 +2,7 @@
 
 ### All vignettes
 
-- [Introduction to
-  CSIAPPS](https://csiontario.github.io/csiapps/articles/csiapps.md):
+- [CSIAPPS REST
+  API](https://csiontario.github.io/csiapps/articles/api.md):
+- [Developing Shiny Web
+  Applications](https://csiontario.github.io/csiapps/articles/csiapps.md):

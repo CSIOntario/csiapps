@@ -24,6 +24,8 @@ The following environment variables must be set to use the package:
 
 Please refer to
 [`vignette("csiapps")`](https://csiontario.github.io/csiapps/articles/csiapps.md)
+and
+[`vignette("api")`](https://csiontario.github.io/csiapps/articles/api.md)
 for more information on how to use this library.
 
 # Package index
@@ -32,7 +34,7 @@ for more information on how to use this library.
 
 ### Shiny
 
-Convenience wrappers developing Shiny web applications.
+Convenience functions for developing Shiny web applications.
 
 - [`ui_wrapper()`](https://csiontario.github.io/csiapps/reference/ui_wrapper.md)
   : Wrapper UI for Shiny apps
@@ -40,23 +42,18 @@ Convenience wrappers developing Shiny web applications.
   : Wrapper server function for Shiny apps
 - [`global_wrapper()`](https://csiontario.github.io/csiapps/reference/global_wrapper.md)
   : Wrap Global code for Shiny apps
-
-### Utility
-
-Functions for interfacing with the CSIAPPS REST API.
-
 - [`check_secrets()`](https://csiontario.github.io/csiapps/reference/check_secrets.md)
   : Function to check that required environment variables for APPS
   authentication are set and valid
 - [`set_institute()`](https://csiontario.github.io/csiapps/reference/set_institute.md)
   : Set the target institute for API calls
 
-### Warehouse
+### API
 
-Functions for interfacing with the CSIAPPS data warehouse.
+Functions for interfacing with the CSIAPPS REST API.
 
-- [`new_warehouse_client()`](https://csiontario.github.io/csiapps/reference/new_warehouse_client.md)
-  : Create a Warehouse API client
+- [`make_request()`](https://csiontario.github.io/csiapps/reference/make_request.md)
+  : Make an authenticated API request to CSIAPPS
 - [`flatten_record()`](https://csiontario.github.io/csiapps/reference/flatten_record.md)
   : Flatten a record object into a simpler structure
 
@@ -64,5 +61,7 @@ Functions for interfacing with the CSIAPPS data warehouse.
 
 ### All vignettes
 
-- [Introduction to
-  CSIAPPS](https://csiontario.github.io/csiapps/articles/csiapps.md):
+- [CSIAPPS REST
+  API](https://csiontario.github.io/csiapps/articles/api.md):
+- [Developing Shiny Web
+  Applications](https://csiontario.github.io/csiapps/articles/csiapps.md):

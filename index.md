@@ -24,4 +24,6 @@ The following environment variables must be set to use the package:
 
 Please refer to
 [`vignette("csiapps")`](https://csiontario.github.io/csiapps/articles/csiapps.md)
+and
+[`vignette("api")`](https://csiontario.github.io/csiapps/articles/api.md)
 for more information on how to use this library.

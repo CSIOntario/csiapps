@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Introduction to CSIAPPS • csiapps</title>
+<title>Developing Shiny Web Applications • csiapps</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Introduction to CSIAPPS">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Developing Shiny Web Applications">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -36,6 +36,12 @@
       <ul class="navbar-nav me-auto">
 <li class="active nav-item"><a class="nav-link" href="../articles/csiapps.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="../articles/api.html">CSIAPPS REST API</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -54,7 +60,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Introduction to CSIAPPS</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Developing Shiny Web Applications</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/CSIOntario/csiapps/blob/main/vignettes/csiapps.Rmd" class="external-link"><code>vignettes/csiapps.Rmd</code></a></small>
@@ -64,11 +70,8 @@
     
     
 <div class="section level2">
-<h2 id="developing-shiny-web-applications">Developing Shiny Web Applications<a class="anchor" aria-label="anchor" href="#developing-shiny-web-applications"></a>
+<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<div class="section level3">
-<h3 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
-</h3>
 <p>Suppose that you have the following shiny web application:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
@@ -106,48 +109,50 @@
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span>ui <span class="op">=</span> <span class="va">ui</span>, server <span class="op">=</span> <span class="va">server</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="process">Process<a class="anchor" aria-label="anchor" href="#process"></a>
-</h3>
 <p>To migrate this app within the <code>CSIAPPS</code> ecosystem, we can
 leverage several functions provided by <code>csiapps</code>.</p>
-<ol style="list-style-type: decimal">
-<li>We specify which institute internal API calls should be made for
+<div class="section level3">
+<h3 id="set_institute">1. <code>set_institute()</code><a class="anchor" aria-label="anchor" href="#set_institute"></a>
+</h3>
+<p>We specify which institute internal API calls should be made for
 (such as authentication redirects) by the application using
-<code><a href="../reference/set_institute.html">set_institute()</a></code>.</li>
-</ol>
+<code><a href="../reference/set_institute.html">set_institute()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># institute can be set to one of "csiontario" or "csipacific"</span></span>
 <span><span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/set_institute.html">set_institute</a></span><span class="op">(</span><span class="st">"csiontario"</span><span class="op">)</span></span></code></pre></div>
-<ol start="2" style="list-style-type: decimal">
-<li>We then run <code><a href="../reference/check_secrets.html">check_secrets()</a></code> to ensure that all
+</div>
+<div class="section level3">
+<h3 id="check_secrets">2. <code>check_secrets()</code><a class="anchor" aria-label="anchor" href="#check_secrets"></a>
+</h3>
+<p>We then run <code><a href="../reference/check_secrets.html">check_secrets()</a></code> to ensure that all
 environment variables required have been set. The <code>verbose</code>
 argument, which is <code>FALSE</code> by default, can be set to
 <code>TRUE</code> to print out the values of the environment variables
 that are being checked. <code><a href="../reference/check_secrets.html">check_secrets()</a></code> will throw an error
 if any of the required environment variables are not present, making it
-useful for debugging.</li>
-</ol>
+useful for debugging.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/check_secrets.html">check_secrets</a></span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
-<ol start="3" style="list-style-type: decimal">
-<li>In the application, for code defined outside but used within the
-<code>server</code> function, we use <code><a href="../reference/global_wrapper.html">global_wrapper()</a></code> to
-ensure that it is accessible by internal <code>csiapps</code>
-functions.</li>
-</ol>
+</div>
+<div class="section level3">
+<h3 id="global_wrapper">3. <code>global_wrapper()</code><a class="anchor" aria-label="anchor" href="#global_wrapper"></a>
+</h3>
+<p>For code defined outside but used within the <code>server</code>
+function, we use <code><a href="../reference/global_wrapper.html">global_wrapper()</a></code> to ensure that it is
+accessible by internal helper functions.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/global_wrapper.html">global_wrapper</a></span><span class="op">(</span><span class="op">{</span></span>
 <span>  <span class="va">df</span> <span class="op">=</span> <span class="va">faithful</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span></span>
 <span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<ol start="4" style="list-style-type: decimal">
-<li>For the <code>ui</code>, it can simply be wrapped within
-<code><a href="../reference/ui_wrapper.html">ui_wrapper()</a></code>, which includes additional code to redirect
-the app to CSIAPPS for user authentication and aesthetic formatting. The
-same principle applies to the <code>server</code> function, which can be
-wrapped within <code><a href="../reference/server_wrapper.html">server_wrapper()</a></code>.</li>
-</ol>
+</div>
+<div class="section level3">
+<h3 id="ui_wrapper-and-server_wrapper">4. <code>ui_wrapper()</code> and <code>server_wrapper()</code><a class="anchor" aria-label="anchor" href="#ui_wrapper-and-server_wrapper"></a>
+</h3>
+<p>The <code>ui</code> page and <code>server</code> function can simply
+be wrapped by <code><a href="../reference/ui_wrapper.html">ui_wrapper()</a></code> and
+<code><a href="../reference/server_wrapper.html">server_wrapper()</a></code>, respectively. These convenience functions
+include additional code to redirect the application to CSIAPPS for user
+authentication and provide aesthetic formatting.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># original code</span></span>
 <span></span>
@@ -160,8 +165,12 @@ wrapped within <code><a href="../reference/server_wrapper.html">server_wrapper()
 <span><span class="co"># wrapped code</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span>ui <span class="op">=</span> <span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/ui_wrapper.html">ui_wrapper</a></span><span class="op">(</span><span class="va">ui</span><span class="op">)</span>, server <span class="op">=</span> <span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/server_wrapper.html">server_wrapper</a></span><span class="op">(</span><span class="va">server</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Thefore, the full code for the app, after migration, would look like
-this:</p>
+</div>
+<div class="section level3">
+<h3 id="summary">Summary<a class="anchor" aria-label="anchor" href="#summary"></a>
+</h3>
+<p>Therefore, the full code for the app, after migration, would look
+like this:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CSIOntario/csiapps" class="external-link">csiapps</a></span><span class="op">)</span></span>
@@ -209,68 +218,6 @@ this:</p>
 <span></span>
 <span><span class="co"># Run the application </span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shinyApp</a></span><span class="op">(</span>ui <span class="op">=</span> <span class="fu"><a href="../reference/ui_wrapper.html">ui_wrapper</a></span><span class="op">(</span><span class="va">ui</span><span class="op">)</span>, server <span class="op">=</span> <span class="fu"><a href="../reference/server_wrapper.html">server_wrapper</a></span><span class="op">(</span><span class="va">server</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="interfacing-with-the-csiapps-rest-api">Interfacing with the CSIAPPS REST API<a class="anchor" aria-label="anchor" href="#interfacing-with-the-csiapps-rest-api"></a>
-</h2>
-<p><code>csiapps</code> includes several functions to make API calls to
-the <code>CSIAPPS</code> data warehouse while abstracting away the
-underlying HTTP requests.</p>
-<p>We first generate a warehouse client object using
-<code><a href="../reference/new_warehouse_client.html">new_warehouse_client()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wc</span> <span class="op">&lt;-</span> <span class="fu">csiapps</span><span class="fu">::</span><span class="fu"><a href="../reference/new_warehouse_client.html">new_warehouse_client</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="ingest_raw">
-<code>ingest_raw()</code><a class="anchor" aria-label="anchor" href="#ingest_raw"></a>
-</h3>
-<p>To ingest raw data into the warehouse, <code>ingest_raw()</code>,
-which is a convenience wrapper for the
-<code>/api/warehouse/ingestion/primary/</code> endpoint, can be used. It
-requires the <code>SOURCE_UUID</code> of the target table, a list of
-<code>records</code> to be ingested, the <code>subject_field</code> by
-which the record can be uniquely identified. The records must comply
-with the schema defined for the target table.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wc</span><span class="op">$</span><span class="fu">ingest_raw</span><span class="op">(</span></span>
-<span>  source_uuid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span>,</span>
-<span>  records <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"xxxx"</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"yyyy"</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>    <span class="va">...</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  subject_field <span class="op">=</span> <span class="st">"id"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="list_records">
-<code>list_records()</code><a class="anchor" aria-label="anchor" href="#list_records"></a>
-</h3>
-<p>To retrieve data from the warehouse, <code>list_records()</code>, a
-convenience wrapper for the <code>/api/warehouse/data-records/</code>
-endpoint, can be used. It requires the <code>SOURCE_UUID</code> of the
-requested table and also includes several optional parameters for
-filtering and pagination.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">records</span> <span class="op">&lt;-</span> <span class="va">wc</span><span class="op">$</span><span class="fu">list_records</span><span class="op">(</span></span>
-<span>  source_uuid <span class="op">=</span> <span class="st">"SOURCE_UUID"</span>, </span>
-<span>  collected_after <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span> <span class="op">-</span> <span class="fl">30</span>,</span>
-<span>  collected_before <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.time.html" class="external-link">Sys.Date</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>  extra_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>role <span class="op">=</span> <span class="st">"primary"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code></pre></div>
-<p>After retrieving records, <code><a href="../reference/flatten_record.html">flatten_record()</a></code> can be used
-to flatten nested records into a more tabular format for easier
-analysis. It retains the original <code>data</code> payload and also
-includes additional metadata fields such as the unique <code>id</code>,
-the timestamp of when the record was collected, and any other relevant
-information.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">flat_records</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">records</span>, <span class="va">flatten_record</span><span class="op">)</span></span></code></pre></div>
-<p>To use native HTTP requests for more customized interactions with the
-API, please refer to the Swagger documentation, which can be found at <a href="https://apps.csiontario.ca/api/swagger/" class="external-link uri">https://apps.csiontario.ca/api/swagger/</a>. It includes
-details on the available endpoints, request parameters, and response
-formats.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
