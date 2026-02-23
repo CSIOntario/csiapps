@@ -17,5 +17,4 @@ reference:
     Functions for interfacing with the CSIAPPS REST API.
   contents:
   - make_request
-  - flatten_record
 

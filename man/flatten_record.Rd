@@ -16,3 +16,4 @@ a list with flattened fields for easier analysis, including
 \description{
 Flatten a record object into a simpler structure
 }
+\keyword{internal}

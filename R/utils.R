@@ -69,7 +69,7 @@ check_secrets <- function(verbose = F) {
 #'
 #' @return a list with flattened fields for easier analysis, including
 #' `id`, `dataset_uuid`, `profile` (subject name), `created_at`, `updated_at`, `sport`, and `data` (original data payload)
-#' @export
+#' @keywords internal
 flatten_record <- function(rec) {
   data <- rec$data %||% list()
 
