@@ -70,8 +70,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CSIOntario/csiapps" class="external-link">csiapps</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/CSIOntario/csiapps" class="external-link">csiapps</a></span><span class="op">)</span></span></code></pre></div>
 <p><code>csiapps</code> includes a generic <code><a href="../reference/make_request.html">make_request()</a></code>
 function to make requests to the <code>CSIAPPS</code> REST API. Please
 refer to the <a href="https://apps.csiontario.ca/api/swagger/" class="external-link">CSIAPPS
@@ -80,18 +79,31 @@ parameters, and response formats.</p>
 <p>Below are some common use cases for interacting with the API
 endpoints using <code>csiapps</code>.</p>
 <div class="section level3">
+<h3 id="authorization-status">Authorization Status<a class="anchor" aria-label="anchor" href="#authorization-status"></a>
+</h3>
+<p>The most basic endpoint is the <code>/api/csiauth/me/</code>
+endpoint, which can be used to check the status of the user making the
+request. This endpoint requires authentication, so if the request is
+successful, it indicates that your access token is valid and has the
+necessary permissions to access the REST API.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
+<span>  endpoint <span class="op">=</span> <span class="st">"api/csiauth/me/"</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
 <h3 id="data-warehouse-ingestion">Data Warehouse Ingestion<a class="anchor" aria-label="anchor" href="#data-warehouse-ingestion"></a>
 </h3>
 <p>To ingest raw data into the warehouse, we make a POST request to the
-<code>/api/warehouse/ingestion/primary/</code> endpoint. The only
-mandatory query parameter is the <code>source</code> (uuid) of the
-target table, a list of <code>records</code> to be ingested, the
+<code>/api/warehouse/ingestion/primary/</code> endpoint. Users supply
+the <code>source</code> (uuid) of the target table, a list of
+<code>records</code> to be ingested, and (optionally) the
 <code>subject_field</code> by which the record can be uniquely
 identified. The records must comply with the schema defined for the
 target table.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
-<span>  endpoint <span class="op">=</span> <span class="st">"api/warehouse/ingestion/primary"</span>,</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
+<span>  endpoint <span class="op">=</span> <span class="st">"api/warehouse/ingestion/primary/"</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"POST"</span>,</span>
 <span>  body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span>,</span>
@@ -114,28 +126,20 @@ table, but there are several optional parameters for additional
 filtering. Note that we can set the <code>paginate</code> argument to
 <code>TRUE</code> to retrieve all records matching the query
 parameters.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
 <span>    endpoint <span class="op">=</span> <span class="st">"api/warehouse/data-records"</span>,</span>
 <span>    query <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>source_uuid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    paginate <span class="op">=</span> <span class="cn">T</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">bind_rows</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="data-record-flattening">Data Record Flattening<a class="anchor" aria-label="anchor" href="#data-record-flattening"></a>
-</h3>
-<p>After retrieving records, <code><a href="../reference/flatten_record.html">flatten_record()</a></code> can be used
-to flatten nested records into a more tabular format for easier
-analysis. It retains the original <code>data</code> payload and also
-includes additional metadata fields such as the unique <code>id</code>,
-the timestamp of when the record was collected, and any other relevant
-information.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">flat_records</span> <span class="op">&lt;-</span> </span>
-<span>  <span class="va">records</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu">pull</span><span class="op">(</span><span class="va">results</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">flatten_record</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="op">)</span></span></code></pre></div>
+<!-- ### Data Record Flattening -->
+<!-- After retrieving records, `flatten_record()` can be used to flatten nested records into a more tabular format for easier analysis. It retains the original `data` payload and also includes additional metadata fields such as the unique `id`, the timestamp of when the record was collected, and any other relevant information. -->
+<!-- ```{r flatten-records} -->
+<!-- flat_records <-  -->
+<!--   records |>  -->
+<!--   dplyr::pull(results) |>  -->
+<!--   lapply(flatten_record) -->
+<!-- ``` -->
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -24,5 +24,3 @@ Functions for interfacing with the CSIAPPS REST API.
 
 - [`make_request()`](https://csiontario.github.io/csiapps/reference/make_request.md)
   : Make an authenticated API request to CSIAPPS
-- [`flatten_record()`](https://csiontario.github.io/csiapps/reference/flatten_record.md)
-  : Flatten a record object into a simpler structure

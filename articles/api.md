@@ -2,7 +2,6 @@
 
 ``` r
 library(csiapps)
-library(dplyr)
 ```
 
 `csiapps` includes a generic
@@ -15,18 +14,32 @@ formats.
 Below are some common use cases for interacting with the API endpoints
 using `csiapps`.
 
+### Authorization Status
+
+The most basic endpoint is the `/api/csiauth/me/` endpoint, which can be
+used to check the status of the user making the request. This endpoint
+requires authentication, so if the request is successful, it indicates
+that your access token is valid and has the necessary permissions to
+access the REST API.
+
+``` r
+result <- make_request(
+  endpoint = "api/csiauth/me/"
+)
+```
+
 ### Data Warehouse Ingestion
 
 To ingest raw data into the warehouse, we make a POST request to the
-`/api/warehouse/ingestion/primary/` endpoint. The only mandatory query
-parameter is the `source` (uuid) of the target table, a list of
-`records` to be ingested, the `subject_field` by which the record can be
-uniquely identified. The records must comply with the schema defined for
-the target table.
+`/api/warehouse/ingestion/primary/` endpoint. Users supply the `source`
+(uuid) of the target table, a list of `records` to be ingested, and
+(optionally) the `subject_field` by which the record can be uniquely
+identified. The records must comply with the schema defined for the
+target table.
 
 ``` r
-make_request(
-  endpoint = "api/warehouse/ingestion/primary",
+result <- make_request(
+  endpoint = "api/warehouse/ingestion/primary/",
   method = "POST",
   body = list(
     source = Sys.getenv("SOURCE_UUID"),
@@ -54,23 +67,5 @@ records <- make_request(
     endpoint = "api/warehouse/data-records",
     query = list(source_uuid = Sys.getenv("SOURCE_UUID")),
     paginate = T
-    ) |>
-  dplyr::bind_rows()
-```
-
-### Data Record Flattening
-
-After retrieving records,
-[`flatten_record()`](https://csiontario.github.io/csiapps/reference/flatten_record.md)
-can be used to flatten nested records into a more tabular format for
-easier analysis. It retains the original `data` payload and also
-includes additional metadata fields such as the unique `id`, the
-timestamp of when the record was collected, and any other relevant
-information.
-
-``` r
-flat_records <- 
-  records |> 
-  dplyr::pull(results) |> 
-  lapply(flatten_record)
+    )
 ```
