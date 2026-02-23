@@ -19,17 +19,17 @@ using `csiapps`.
 
 To ingest raw data into the warehouse, we make a POST request to the
 `/api/warehouse/ingestion/primary/` endpoint. The only mandatory query
-parameter is the `source_uuid` of the target table, a list of `records`
-to be ingested, the `subject_field` by which the record can be uniquely
-identified. The records must comply with the schema defined for the
-target table.
+parameter is the `source` (uuid) of the target table, a list of
+`records` to be ingested, the `subject_field` by which the record can be
+uniquely identified. The records must comply with the schema defined for
+the target table.
 
 ``` r
 make_request(
   endpoint = "api/warehouse/ingestion/primary",
   method = "POST",
   body = list(
-    source_uuid = Sys.getenv("SOURCE_UUID"),
+    source = Sys.getenv("SOURCE_UUID"),
     records = list(
       list(id = "xxxx", ...),
       list(id = "yyyy", ...),

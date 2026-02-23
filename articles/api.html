@@ -84,8 +84,8 @@ endpoints using <code>csiapps</code>.</p>
 </h3>
 <p>To ingest raw data into the warehouse, we make a POST request to the
 <code>/api/warehouse/ingestion/primary/</code> endpoint. The only
-mandatory query parameter is the <code>source_uuid</code> of the target
-table, a list of <code>records</code> to be ingested, the
+mandatory query parameter is the <code>source</code> (uuid) of the
+target table, a list of <code>records</code> to be ingested, the
 <code>subject_field</code> by which the record can be uniquely
 identified. The records must comply with the schema defined for the
 target table.</p>
@@ -94,7 +94,7 @@ target table.</p>
 <span>  endpoint <span class="op">=</span> <span class="st">"api/warehouse/ingestion/primary"</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"POST"</span>,</span>
 <span>  body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>    source_uuid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span>,</span>
+<span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span>,</span>
 <span>    records <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"xxxx"</span>, <span class="va">...</span><span class="op">)</span>,</span>
 <span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"yyyy"</span>, <span class="va">...</span><span class="op">)</span>,</span>

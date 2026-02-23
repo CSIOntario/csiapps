@@ -48,6 +48,7 @@
 <span>  body <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  query <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  base_url <span class="op">=</span> <span class="fu">SITE_URL</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  headers <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  token <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"CSIAPPS_ACCESS_TOKEN"</span><span class="op">)</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">20L</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -78,6 +79,10 @@
 
 <dt id="arg-base-url">base_url<a class="anchor" aria-label="anchor" href="#arg-base-url"></a></dt>
 <dd><p>Base URL for the API; defaults to SITE_URL()</p></dd>
+
+
+<dt id="arg-headers">headers<a class="anchor" aria-label="anchor" href="#arg-headers"></a></dt>
+<dd><p>Optional list of additional HTTP headers to include in the request</p></dd>
 
 
 <dt id="arg-token">token<a class="anchor" aria-label="anchor" href="#arg-token"></a></dt>
