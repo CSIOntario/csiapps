@@ -1,4 +1,3 @@
-
 # ---- CSI APPS/Warehouse constants ----
 SPORT_ORG_ENDPOINT <- "/api/registration/organization/"
 PROFILE_ENDPOINT <- "/api/registration/profile/"
@@ -141,12 +140,12 @@ fetch_org_options <- function(token = NULL) {
   rv
 }
 
-fetch_profiles_api <- function(token = NULL, filters = list()) {
+fetch_profiles <- function(token = NULL, filters = list()) {
   if (is.null(token) || !nzchar(token)) {
     token <- Sys.getenv("CSIAPPS_ACCESS_TOKEN")
   }
   if (!nzchar(token)) {
-    stop("fetch_profiles_api: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
+    stop("fetch_profiles: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
   }
 
   url    <- paste0(SITE_URL(), PROFILE_ENDPOINT)  # "/api/registration/profile/"
@@ -169,7 +168,7 @@ fetch_profiles_api <- function(token = NULL, filters = list()) {
     txt    <- httr2::resp_body_string(resp)
 
     if (status >= 400) {
-      stop(sprintf("fetch_profiles_api failed (%s): %s", status, txt))
+      stop(sprintf("fetch_profiles failed (%s): %s", status, txt))
     }
 
     payload <- jsonlite::fromJSON(txt, simplifyVector = FALSE)
@@ -183,12 +182,12 @@ fetch_profiles_api <- function(token = NULL, filters = list()) {
   all
 }
 
-fetch_profile_api <- function(token = NULL, profile_id) {
+fetch_profile <- function(token = NULL, profile_id) {
   if (is.null(token) || !nzchar(token)) {
     token <- Sys.getenv("CSIAPPS_ACCESS_TOKEN")
   }
   if (!nzchar(token)) {
-    stop("fetch_profile_api: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
+    stop("fetch_profile: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
   }
 
   path <- sprintf("%s%s", PROFILE_ENDPOINT, profile_id)  # "/api/registration/profile/{id}"
@@ -205,7 +204,7 @@ fetch_profile_api <- function(token = NULL, profile_id) {
   txt    <- httr2::resp_body_string(resp)
 
   if (status >= 400) {
-    stop(sprintf("fetch_profile_api failed (%s): %s", status, txt))
+    stop(sprintf("fetch_profile failed (%s): %s", status, txt))
   }
 
   jsonlite::fromJSON(txt, simplifyVector = FALSE)
@@ -285,3 +284,93 @@ exchange_code_for_token <- function(code, code_verifier = NULL) {
     )
   }
 }
+
+
+#' Make an authenticated API request to CSIAPPS
+#'
+#' @param endpoint API endpoint path.
+#' @param method HTTP method. Defaults to "GET"
+#' @param body Optional request body for POST/PUT/PATCH requests; should be an R object that can be serialized to JSON
+#' @param query Optional list of query parameters to include in the request URL
+#' @param base_url Base URL for the API; defaults to SITE_URL()
+#' @param token Authentication token. Will attempt to read from CSIAPPS_ACCESS_TOKEN environment variable if not provided explicitly.
+#' @param timeout Request timeout in seconds; defaults to 20
+#' @param verbose If TRUE, prints request and response details to the console for debugging purposes
+#' @param paginate If TRUE, will attempt to paginate through results using "next" links in the API response. Defaults to FALSE.
+#' @param max_pages Maximum number of pages to fetch when paginate = TRUE; defaults to 50 to prevent infinite loops
+#'
+#' @return List of parsed API responses
+#' @export
+make_request <- function(
+    endpoint,
+    method = "GET",
+    body = NULL,
+    query = list(),
+    base_url = SITE_URL(),
+    token = Sys.getenv("CSIAPPS_ACCESS_TOKEN"),
+    timeout = 20L,
+    verbose = FALSE,
+    paginate = FALSE,
+    max_pages = 50
+  ) {
+  if (!nzchar(token)) {
+    stop("make_request: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
+  }
+
+  req <- httr2::request(base_url) |>
+    httr2::req_url_path_append(endpoint) |>
+    httr2::req_method(toupper(method)) |>
+    httr2::req_auth_bearer_token(token) |>
+    httr2::req_timeout(timeout) |>
+    httr2::req_retry(max_tries = 3, max_seconds = 10) # might want to play with this
+
+  if (!is.null(body)) req <- req |> httr2::req_body_json(body)
+  if (length(query) > 0) req <- req |> httr2::req_url_query(!!!query)
+
+  parse_response <- function(resp) {
+    status <- httr2::resp_status(resp)
+    txt    <- httr2::resp_body_string(resp)
+
+    if(length(txt) == 0) {
+      return(list())
+    }
+
+    if(verbose) {
+      message(method, " request to ", endpoint, " returned status ", status)
+      if (!is.null(query)) message("  params:", paste(names(query), query, collapse = ", "), "\n")
+      cat("  response:\n", txt, "\n")
+    }
+
+    if (status >= 400) {
+      stop(sprintf("API request failed (%s): %s", status, txt))
+    }
+
+    tryCatch(
+      jsonlite::fromJSON(txt, simplifyVector = FALSE),
+      error = function(e) list(raw = txt, error = "json_parse_error", message = e$message)
+    )
+  }
+
+  if(paginate) {
+
+    next_by_link <- function(resp, req) {
+      next_url <- httr2::resp_body_json(resp, simplifyVector = FALSE)$`next`
+      if (is.null(next_url)) return(NULL)
+      req |> httr2::req_url(next_url)
+    }
+
+    resps <- req |> httr2::req_perform_iterative(
+      next_req = next_by_link,
+      max_reqs = max_pages,
+      progress = F
+    )
+
+    return(lapply(resps, parse_response))
+
+  } else{
+    return(parse_response(httr2::req_perform(req)))
+  }
+}
+
+`%||%` <- function(a, b) if (!is.null(a)) a else b
+`%+%`  <- function(a, b) paste0(a, b)

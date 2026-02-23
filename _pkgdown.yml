@@ -5,21 +5,17 @@ reference:
 - title: Functions
 - subtitle: Shiny
   desc: |
-    Convenience wrappers developing Shiny web applications.
+    Convenience functions for developing Shiny web applications.
   contents:
   - ui_wrapper
   - server_wrapper
   - global_wrapper
-- subtitle: Utility
+  - check_secrets
+  - set_institute
+- subtitle: API
   desc: |
     Functions for interfacing with the CSIAPPS REST API.
   contents:
-  - check_secrets
-  - set_institute
-- subtitle: Warehouse
-  desc: |
-    Functions for interfacing with the CSIAPPS data warehouse.
-  contents:
-  - new_warehouse_client
+  - make_request
   - flatten_record
 

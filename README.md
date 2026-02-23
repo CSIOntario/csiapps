@@ -28,5 +28,5 @@ The following environment variables must be set to use the package:
   after authentication.
 - `CSIAPPS_SCOPE`: (optional) The scope of the authentication request.
 
-Please refer to `vignette("csiapps")` for more information on how to use
-this library.
+Please refer to `vignette("csiapps")` and `vignette("api")` for more
+information on how to use this library.
