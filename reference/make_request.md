@@ -10,7 +10,6 @@ make_request(
   method = "GET",
   body = NULL,
   query = list(),
-  base_url = SITE_URL(),
   headers = list(),
   token = Sys.getenv("CSIAPPS_ACCESS_TOKEN"),
   timeout = 20L,
@@ -38,10 +37,6 @@ make_request(
 - query:
 
   Optional list of query parameters to include in the request URL
-
-- base_url:
-
-  Base URL for the API; defaults to SITE_URL()
 
 - headers:
 

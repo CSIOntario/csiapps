@@ -4,6 +4,17 @@
 library(csiapps)
 ```
 
+### Preamble
+
+The following environment variables must be set to make requests to the
+`CSIAPPS` REST API:
+
+- `CSIAPPS_ACCESS_TOKEN`: The access token for authenticating API
+  requests. This token should have the necessary permissions to access
+  the desired endpoints.
+
+### Overview
+
 `csiapps` includes a generic
 [`make_request()`](https://csiontario.github.io/csiapps/reference/make_request.md)
 function to make requests to the `CSIAPPS` REST API. Please refer to the

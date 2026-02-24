@@ -1,5 +1,18 @@
 # Developing Shiny Web Applications
 
+### Preamble
+
+The following environment variables must be set before developing a
+shiny web application within the `CSIAPPS` ecosystem:
+
+- `CSIAPPS_CLIENT_ID`: The client ID for the application registered in
+  CSIAPPS.
+- `CSIAPPS_CLIENT_SECRET`: The client secret for the application
+  registered in CSIAPPS.
+- `CSIAPPS_REDIRECT_URL`: The URL to which the application will redirect
+  after authentication.
+- `CSIAPPS_SCOPE`: (optional) The scope of the authentication request.
+
 ## Example
 
 Suppose that you have the following shiny web application:
