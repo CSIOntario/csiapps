@@ -19,6 +19,14 @@ knitr::opts_chunk$set(
 library(csiapps)
 ```
 
+### Preamble
+
+The following environment variables must be set to make requests to the `CSIAPPS` REST API:
+
+-   `CSIAPPS_ACCESS_TOKEN`: The access token for authenticating API requests. This token should have the necessary permissions to access the desired endpoints.
+
+### Overview
+
 `csiapps` includes a generic `make_request()` function to make requests to the `CSIAPPS` REST API.
 Please refer to the [CSIAPPS Swagger documentation](https://apps.csiontario.ca/api/swagger/)
 for full details on available endpoints, parameters, and response formats. 

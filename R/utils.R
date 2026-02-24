@@ -292,7 +292,6 @@ exchange_code_for_token <- function(code, code_verifier = NULL) {
 #' @param method HTTP method. Defaults to "GET"
 #' @param body Optional request body for POST/PUT/PATCH requests; should be an R object that can be serialized to JSON
 #' @param query Optional list of query parameters to include in the request URL
-#' @param base_url Base URL for the API; defaults to SITE_URL()
 #' @param headers Optional list of additional HTTP headers to include in the request
 #' @param token Authentication token. Will attempt to read from CSIAPPS_ACCESS_TOKEN environment variable if not provided explicitly.
 #' @param timeout Request timeout in seconds; defaults to 20
@@ -307,7 +306,6 @@ make_request <- function(
     method = "GET",
     body = NULL,
     query = list(),
-    base_url = SITE_URL(),
     headers = list(),
     token = Sys.getenv("CSIAPPS_ACCESS_TOKEN"),
     timeout = 20L,
@@ -319,7 +317,7 @@ make_request <- function(
     stop("make_request: no CSIAPPS_ACCESS_TOKEN set; user not authenticated?")
   }
 
-  req <- httr2::request(base_url) |>
+  req <- httr2::request(SITE_URL()) |>
     httr2::req_url_path_append(endpoint) |>
     httr2::req_method(toupper(method)) |>
     httr2::req_auth_bearer_token(token) |>
