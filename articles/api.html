@@ -88,9 +88,8 @@ permissions to access the desired endpoints.</li>
 </h3>
 <p><code>csiapps</code> includes a generic <code><a href="../reference/make_request.html">make_request()</a></code>
 function to make requests to the <code>CSIAPPS</code> REST API. Please
-refer to the <a href="https://apps.csiontario.ca/api/swagger/" class="external-link">CSIAPPS
-Swagger documentation</a> for full details on available endpoints,
-parameters, and response formats.</p>
+refer to the <a href="https://apps.csiontario.ca/api/swagger/" target="_blank" class="external-link">CSIAPPS Swagger documentation</a> for full details on
+available endpoints, parameters, and response formats.</p>
 <p>Below are some common use cases for interacting with the API
 endpoints using <code>csiapps</code>.</p>
 </div>
@@ -110,27 +109,104 @@ necessary permissions to access the REST API.</p>
 <div class="section level3">
 <h3 id="data-warehouse-ingestion">Data Warehouse Ingestion<a class="anchor" aria-label="anchor" href="#data-warehouse-ingestion"></a>
 </h3>
-<p>To ingest raw data into the warehouse, we make a POST request to the
-<code>/api/warehouse/ingestion/primary/</code> endpoint. Users supply
-the <code>source</code> (uuid) of the target table, a list of
-<code>records</code> to be ingested, and (optionally) the
-<code>subject_field</code> by which the record can be uniquely
-identified. The records must comply with the schema defined for the
-target table.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>To ingest data records into the warehouse, we make a POST request to
+the <code>/api/warehouse/ingestion/primary/</code> endpoint. Users
+supply the <code>source</code> (uuid) of the target <em>data
+source</em>, a list of <code>records</code> to be ingested, and
+(optionally) the <code>subject_field</code> by which each record can be
+uniquely assigned to a user. The records must comply with the schema
+defined for the target data source.</p>
+<div class="section level4">
+<h4 id="json-schema-definition">JSON Schema Definition<a class="anchor" aria-label="anchor" href="#json-schema-definition"></a>
+</h4>
+<p>Consider the following <a href="https://json-schema.org/learn" target="_blank" class="external-link">JSON Schema</a>:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"A registration form"</span><span class="fu">,</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>  <span class="dt">"description"</span><span class="fu">:</span> <span class="st">"A simple form example."</span><span class="fu">,</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"object"</span><span class="fu">,</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="dt">"required"</span><span class="fu">:</span> <span class="ot">[</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>    <span class="st">"id"</span><span class="ot">,</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="st">"firstName"</span><span class="ot">,</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>    <span class="st">"lastName"</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="ot">]</span><span class="fu">,</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="dt">"properties"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>    <span class="dt">"id"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">,</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"ID"</span></span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>    <span class="dt">"firstName"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">,</span></span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"First name"</span><span class="fu">,</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>      <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"Chuck"</span></span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>    <span class="dt">"lastName"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">,</span></span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"Last name"</span><span class="fu">,</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>      <span class="dt">"default"</span><span class="fu">:</span> <span class="st">"Norris"</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>    <span class="dt">"age"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"integer"</span><span class="fu">,</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"Age"</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>    <span class="fu">},</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>    <span class="dt">"telephone"</span><span class="fu">:</span> <span class="fu">{</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a>      <span class="dt">"type"</span><span class="fu">:</span> <span class="st">"string"</span><span class="fu">,</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a>      <span class="dt">"title"</span><span class="fu">:</span> <span class="st">"Telephone"</span><span class="fu">,</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a>      <span class="dt">"minLength"</span><span class="fu">:</span> <span class="dv">10</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a>    <span class="fu">}</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a>  <span class="fu">}</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="fu">}</span></span></code></pre></div>
+<p>Here, <code>id</code> is the required field that serves as the unique
+user assignment for each record.</p>
+<p>To create records that comply with this schema, we create the
+following records:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">records</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"xxxx"</span>, firstName <span class="op">=</span> <span class="st">"John"</span>, lastName <span class="op">=</span> <span class="st">"Doe"</span>, age <span class="op">=</span> <span class="fl">30</span>, telephone <span class="op">=</span> <span class="st">"1234567890"</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"yyyy"</span>, firstName <span class="op">=</span> <span class="st">"Jane"</span>, lastName <span class="op">=</span> <span class="st">"Smith"</span>, age <span class="op">=</span> <span class="fl">25</span>, telephone <span class="op">=</span> <span class="st">"0987654321"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>To retrieve the JSON schema definition from the data warehouse, we
+can make a request to the
+<code>/api/warehouse/data-sources/{uuid}/</code> endpoint, where
+<code>uuid</code> is the uuid of the target data source. The schema
+definition is located in the <code>head_primary_definition$schema</code>
+field of the response.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">data_source</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
+<span>  endpoint <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"api/warehouse/data-sources/"</span>, <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">schema</span> <span class="op">&lt;-</span> <span class="va">data_source</span><span class="op">$</span><span class="va">head_primary_definition</span><span class="op">$</span><span class="va">schema</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="data-record-validation">Data Record Validation<a class="anchor" aria-label="anchor" href="#data-record-validation"></a>
+</h4>
+<p>We can validate data records using the <code>jsonlite</code> and
+<code>jsonvalidate</code> packages. Be sure to set
+<code>auto_unbox = TRUE</code> when converting the JSON objects to
+strings.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">json_schema</span> <span class="op">&lt;-</span> <span class="fu">jsonvalidate</span><span class="fu">::</span><span class="va">json_schema</span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">toJSON</a></span><span class="op">(</span><span class="va">schema</span>, auto_unbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">validate_record</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">record</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">json_schema</span><span class="op">$</span><span class="fu">validate</span><span class="op">(</span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">toJSON</a></span><span class="op">(</span><span class="va">record</span>, auto_unbox <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="va">validation_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">records</span>, <span class="va">validate_record</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">validation_results</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Finally, we can make the API request to ingest these records into the
+warehouse:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
 <span>  endpoint <span class="op">=</span> <span class="st">"api/warehouse/ingestion/primary/"</span>,</span>
 <span>  method <span class="op">=</span> <span class="st">"POST"</span>,</span>
 <span>  body <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
 <span>    source <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span>,</span>
-<span>    records <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"xxxx"</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>      <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>id <span class="op">=</span> <span class="st">"yyyy"</span>, <span class="va">...</span><span class="op">)</span>,</span>
-<span>      <span class="va">...</span></span>
-<span>    <span class="op">)</span>,</span>
+<span>    records <span class="op">=</span> <span class="va">records</span>,</span>
 <span>    subject_field <span class="op">=</span> <span class="st">"id"</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
 </div>
 <div class="section level3">
 <h3 id="data-record-retrieval">Data Record Retrieval<a class="anchor" aria-label="anchor" href="#data-record-retrieval"></a>
@@ -139,23 +215,14 @@ target table.</p>
 to the <code>/api/warehouse/data-records/</code> endpoint. The only
 required parameter is the <code>source_uuid</code> of the requested
 table, but there are several optional parameters for additional
-filtering. Note that we can set the <code>paginate</code> argument to
-<code>TRUE</code> to retrieve all records matching the query
-parameters.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+filtering. Note that we can set the <code>paginate = TRUE</code> to
+retrieve all records matching the query parameters.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">records</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/make_request.html">make_request</a></span><span class="op">(</span></span>
 <span>    endpoint <span class="op">=</span> <span class="st">"api/warehouse/data-records"</span>,</span>
 <span>    query <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>source_uuid <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Sys.getenv.html" class="external-link">Sys.getenv</a></span><span class="op">(</span><span class="st">"SOURCE_UUID"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    paginate <span class="op">=</span> <span class="cn">T</span></span>
+<span>    paginate <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>    <span class="op">)</span></span></code></pre></div>
-<!-- ### Data Record Flattening -->
-<!-- After retrieving records, `flatten_record()` can be used to flatten nested records into a more tabular format for easier analysis. It retains the original `data` payload and also includes additional metadata fields such as the unique `id`, the timestamp of when the record was collected, and any other relevant information. -->
-<!-- ```{r flatten-records} -->
-<!-- flat_records <-  -->
-<!--   records |>  -->
-<!--   dplyr::pull(results) |>  -->
-<!--   lapply(flatten_record) -->
-<!-- ``` -->
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

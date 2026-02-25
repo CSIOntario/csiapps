@@ -4,7 +4,7 @@
 
 ### Shiny
 
-Convenience functions for developing Shiny web applications.
+Functions for developing Shiny web applications.
 
 - [`ui_wrapper()`](https://csiontario.github.io/csiapps/reference/ui_wrapper.md)
   : Wrapper UI for Shiny apps
@@ -18,7 +18,7 @@ Convenience functions for developing Shiny web applications.
 - [`set_institute()`](https://csiontario.github.io/csiapps/reference/set_institute.md)
   : Set the target institute for API calls
 
-### API
+### REST API
 
 Functions for interfacing with the CSIAPPS REST API.
 
