@@ -5,14 +5,14 @@ reference:
 - title: Functions
 - subtitle: Shiny
   desc: |
-    Convenience functions for developing Shiny web applications.
+    Functions for developing Shiny web applications.
   contents:
   - ui_wrapper
   - server_wrapper
   - global_wrapper
   - check_secrets
   - set_institute
-- subtitle: API
+- subtitle: REST API
   desc: |
     Functions for interfacing with the CSIAPPS REST API.
   contents:
