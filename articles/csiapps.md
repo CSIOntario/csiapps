@@ -18,6 +18,7 @@ shiny web application within the `CSIAPPS` ecosystem:
 Suppose that you have the following shiny web application:
 
 ``` r
+
 library(shiny)
 
 df = faithful[, 2]
@@ -65,6 +66,7 @@ as authentication redirects) by the application using
 [`set_institute()`](https://csiontario.github.io/csiapps/reference/set_institute.md).
 
 ``` r
+
 # institute can be set to one of "csiontario" or "csipacific"
 csiapps::set_institute("csiontario")
 ```
@@ -82,6 +84,7 @@ will throw an error if any of the required environment variables are not
 present, making it useful for debugging.
 
 ``` r
+
 csiapps::check_secrets(verbose = FALSE)
 ```
 
@@ -92,6 +95,7 @@ For code defined outside but used within the `server` function, we use
 to ensure that it is accessible by internal helper functions.
 
 ``` r
+
 csiapps::global_wrapper({
   df = faithful[, 2]
 })
@@ -108,6 +112,7 @@ redirect the application to CSIAPPS for user authentication and provide
 aesthetic formatting.
 
 ``` r
+
 # original code
 
 ui <- ...
@@ -127,6 +132,7 @@ Therefore, the full code for the app, after migration, would look like
 this:
 
 ``` r
+
 library(shiny)
 library(csiapps)
 

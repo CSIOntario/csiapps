@@ -6,6 +6,7 @@ You can install the development version of `csiapps` from
 [GitHub](https://github.com/CSIOntario/csiapps) with:
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("CSIOntario/csiapps")
 ```

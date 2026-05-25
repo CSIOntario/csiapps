@@ -1,6 +1,7 @@
 # CSIAPPS REST API
 
 ``` r
+
 library(csiapps)
 ```
 
@@ -31,9 +32,14 @@ The most basic endpoint is the `/api/csiauth/me/` endpoint, which can be
 used to check the status of the user making the request. This endpoint
 requires authentication, so if the request is successful, it indicates
 that your access token is valid and has the necessary permissions to
-access the REST API.
+access the REST API. You may need to specify your institute before
+authenticating.
 
 ``` r
+
+
+set_institute("csiontario") # or "csipacific" (the default)
+
 result <- make_request(
   endpoint = "api/csiauth/me/"
 )
@@ -97,6 +103,7 @@ To create records that comply with this schema, we create the following
 records:
 
 ``` r
+
 records <- list(
   list(id = "xxxx", firstName = "John", lastName = "Doe", age = 30, telephone = "1234567890"),
   list(id = "yyyy", firstName = "Jane", lastName = "Smith", age = 25, telephone = "0987654321")
@@ -110,6 +117,7 @@ definition is located in the `head_primary_definition$schema` field of
 the response.
 
 ``` r
+
 data_source <- make_request(
   endpoint = paste0("api/warehouse/data-sources/", Sys.getenv("SOURCE_UUID"))
 )
@@ -124,6 +132,7 @@ packages. Be sure to set `auto_unbox = TRUE` when converting the JSON
 objects to strings.
 
 ``` r
+
 json_schema <- jsonvalidate::json_schema$new(jsonlite::toJSON(schema, auto_unbox = T))
 
 validate_record <- function(record) {
@@ -139,6 +148,7 @@ Finally, we can make the API request to ingest these records into the
 warehouse:
 
 ``` r
+
 result <- make_request(
   endpoint = "api/warehouse/ingestion/primary/",
   method = "POST",
@@ -159,6 +169,7 @@ optional parameters for additional filtering. Note that we can set the
 `paginate = TRUE` to retrieve all records matching the query parameters.
 
 ``` r
+
 records <- make_request(
     endpoint = "api/warehouse/data-records",
     query = list(source_uuid = Sys.getenv("SOURCE_UUID")),
