@@ -1,0 +1,1804 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Helper functions for CSI data warehouse ingestion and Shiny apps — R and Python">
+      
+      
+      
+      
+        <link rel="prev" href="../rest-api/">
+      
+      
+        <link rel="next" href="../parity/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Sandbox mode - csiapps</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#sandbox-mode" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="csiapps" class="md-header__button md-logo" aria-label="csiapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            csiapps
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Sandbox mode
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/CSIOntario/csiapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="csiapps" class="md-nav__button md-logo" aria-label="csiapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    csiapps
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/CSIOntario/csiapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shiny-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shiny apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rest-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sandbox mode
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sandbox mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-real-and-what-is-dummy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is real and what is dummy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enabling-and-disabling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling and disabling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-registration-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The registration workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The registration workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-register-sport-organizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Register sport organizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-register-athletes-under-a-sport-org" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Register athletes under a sport org
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-fetch-orgs-and-athlete-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Fetch orgs and athlete profiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-data-warehouse-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The data warehouse workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The data warehouse workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-register-a-data-source-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Register a data source (schema)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-prepare-and-ingest-records" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Prepare and ingest records
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-pull-records-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Pull records back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspecting-and-resetting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspecting and resetting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-end-to-end-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A complete end-to-end example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-integrating-third-party-vendor-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: integrating third-party vendor data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Worked example: integrating third-party vendor data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-dummy-athletes-and-note-their-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create dummy athletes and note their ids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-register-the-ams_mapping-schema-and-ingest-the-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Register the AMS_mapping schema and ingest the mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-read-the-mapping-back-and-join-your-vendor-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Read the mapping back and join your vendor data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#going-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Going to production
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parity checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://csiontario.github.io/csiapps-r/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R reference ↗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-real-and-what-is-dummy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What is real and what is dummy
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#enabling-and-disabling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Enabling and disabling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-registration-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The registration workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The registration workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-register-sport-organizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Register sport organizations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-register-athletes-under-a-sport-org" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Register athletes under a sport org
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-fetch-orgs-and-athlete-profiles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Fetch orgs and athlete profiles
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-data-warehouse-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The data warehouse workflow
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The data warehouse workflow">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-register-a-data-source-schema" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Register a data source (schema)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-prepare-and-ingest-records" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Prepare and ingest records
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-pull-records-back" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Pull records back
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspecting-and-resetting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspecting and resetting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#a-complete-end-to-end-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        A complete end-to-end example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#worked-example-integrating-third-party-vendor-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Worked example: integrating third-party vendor data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Worked example: integrating third-party vendor data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-create-dummy-athletes-and-note-their-ids" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Create dummy athletes and note their ids
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-register-the-ams_mapping-schema-and-ingest-the-mapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Register the AMS_mapping schema and ingest the mapping
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-read-the-mapping-back-and-join-your-vendor-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Read the mapping back and join your vendor data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#going-to-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Going to production
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limitations
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="sandbox-mode">Sandbox mode</h1>
+<p><code>csiapps</code> ships with a <strong>local sandbox</strong> that emulates the CSIAPPS data
+warehouse and registration API entirely on your machine — no network, no
+authentication, and no risk of writing test data to production. It runs the full
+<strong>schema → validate → ingest → retrieve</strong> warehouse workflow and the
+<strong>register orgs → register athletes → fetch profiles</strong> registration workflow,
+using the <em>same</em> function calls your production app will use.</p>
+<p><strong>Sandbox mode is enabled by default.</strong> Every request routes to a local,
+in-memory warehouse instead of the REST API, and every sandboxed call prints a
+<code>csiapps sandbox:</code> message so it is always visible that no real API call was
+made. When your app is ready, you disable sandbox mode at deployment time — with
+no changes to your app code.</p>
+<h2 id="what-is-real-and-what-is-dummy">What is real and what is dummy</h2>
+<p>Sandbox mode fakes everything except the one thing it cannot fake safely — your
+identity:</p>
+<table>
+<thead>
+<tr>
+<th>Concern</th>
+<th>In sandbox mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Login / <code>/me</code> identity</strong></td>
+<td>Emulated using your real <code>CSIAPPS_ACCESS_TOKEN</code>, used <em>only</em> to load <code>/me</code> so a wrapped app's header shows your real name.</td>
+</tr>
+<tr>
+<td><strong>Sport organizations</strong></td>
+<td>Dummy. Created locally with <code>create_sport_org()</code>.</td>
+</tr>
+<tr>
+<td><strong>Athlete profiles</strong></td>
+<td>Dummy. Created locally with <code>create_profile()</code>.</td>
+</tr>
+<tr>
+<td><strong>Warehouse schemas &amp; records</strong></td>
+<td>Dummy. Registered and ingested into an in-memory warehouse; nothing leaves your machine.</td>
+</tr>
+</tbody>
+</table>
+<p>No real client data is ever read except your own <code>/me</code> identity.</p>
+<h2 id="enabling-and-disabling">Enabling and disabling</h2>
+<p><code>is_sandbox_mode()</code> reports whether the sandbox is on, and supplies the default
+for the <code>sandbox</code> argument of every sandbox-aware function. Resolution order:</p>
+<ol>
+<li>The explicit override, if set, always wins (R: the <code>csiapps.sandbox</code> option;
+   Python: <code>set_sandbox_mode(...)</code>).</li>
+<li>Otherwise <code>CSIAPPS_ENV</code> — only the exact value <code>"production"</code> disables it.</li>
+<li>Otherwise, sandbox mode is <strong>on</strong>.</li>
+</ol>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">R</label><label for="__tabbed_1_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">is_sandbox_mode</span><span class="p">()</span><span class="w">   </span><span class="c1"># TRUE by default</span>
+
+<span class="c1"># Turn sandbox OFF (route to the production warehouse)</span>
+<span class="nf">options</span><span class="p">(</span><span class="n">csiapps.sandbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span><span class="w">   </span><span class="c1"># ...or set CSIAPPS_ENV=production</span>
+
+<span class="c1"># Turn sandbox back ON / restore the default</span>
+<span class="nf">options</span><span class="p">(</span><span class="n">csiapps.sandbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">NULL</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">csiapps</span><span class="o">.</span><span class="n">is_sandbox_mode</span><span class="p">()</span>   <span class="c1"># True by default</span>
+
+<span class="c1"># Turn sandbox OFF (route to the production warehouse)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">set_sandbox_mode</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>   <span class="c1"># ...or set CSIAPPS_ENV=production</span>
+
+<span class="c1"># Turn sandbox back ON / restore the default</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">set_sandbox_mode</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>You can also override the global setting for a <strong>single call</strong> with the
+<code>sandbox</code> argument, which every relevant function accepts:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">R</label><label for="__tabbed_2_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># One real org lookup while the sandbox is otherwise on</span>
+<span class="n">orgs</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_org_options</span><span class="p">(</span><span class="n">sandbox</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># One real org lookup while the sandbox is otherwise on</span>
+<span class="n">orgs</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_org_options</span><span class="p">(</span><span class="n">sandbox</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Best practice for the sandbox → production transition</p>
+<p><strong>Do not set the sandbox toggle in your app code</strong> — rely on the default.
+Hard-coding sandbox <em>on</em> would override the deployer's attempt to turn it
+off, silently serving sandbox data in production. Turn it <em>off</em> only at
+deployment, in a location the deployer controls (R: <code>options(...)</code> in
+<code>global.R</code> / <code>Rprofile.site</code>; either language: <code>CSIAPPS_ENV=production</code> in
+the production environment). The same code then runs unchanged in both.</p>
+</div>
+<h2 id="the-registration-workflow">The registration workflow</h2>
+<p>In sandbox mode the registration helpers read from a <strong>local dummy registry</strong>.
+Seed it with <code>create_sport_org()</code> and <code>create_profile()</code>; the fetch helpers then
+return dummy data in the same shape the real API uses.</p>
+<h3 id="1-register-sport-organizations">1. Register sport organizations</h3>
+<p><code>create_sport_org()</code> registers a dummy sport org. Its <code>name</code> becomes the sport
+name of every athlete created under it. Omit the id to auto-generate an unused
+one in <code>1:999</code>, or pin any positive integer up to 999. Ids must be unique.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">R</label><label for="__tabbed_3_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Auto-generated id</span>
+<span class="n">org</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">create_sport_org</span><span class="p">(</span><span class="s">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="n">org</span><span class="o">$</span><span class="n">id</span>
+
+<span class="c1"># ...or pin a specific id</span>
+<span class="nf">create_sport_org</span><span class="p">(</span><span class="s">&quot;Athletics Canada&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">42L</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Auto-generated id</span>
+<span class="n">org</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">create_sport_org</span><span class="p">(</span><span class="s2">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+
+<span class="c1"># ...or pin a specific id</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">create_sport_org</span><span class="p">(</span><span class="s2">&quot;Athletics Canada&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Calling <code>create_sport_org()</code> outside sandbox mode warns and has no effect.</p>
+<h3 id="2-register-athletes-under-a-sport-org">2. Register athletes under a sport org</h3>
+<p><code>create_profile()</code> generates <code>n</code> random athlete profiles under an <strong>existing</strong>
+sport org. Each profile is production-shaped, so downstream code sees the same
+structure the real API returns. Supply explicit names (both vectors/lists, or
+neither) or let them be generated.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">R</label><label for="__tabbed_4_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># 5 athletes with unique random names (drawn from `babynames`)</span>
+<span class="nf">create_profile</span><span class="p">(</span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">)</span>
+
+<span class="c1"># ...or supply explicit names</span>
+<span class="nf">create_profile</span><span class="p">(</span>
+<span class="w">  </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="n">first_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Ada&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Blair&quot;</span><span class="p">),</span>
+<span class="w">  </span><span class="n">last_names</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Nkemelu&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Okafor&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># 5 athletes with unique random names (generated with `faker`)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">create_profile</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+
+<span class="c1"># ...or supply explicit names</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">create_profile</span><span class="p">(</span>
+    <span class="mi">2</span><span class="p">,</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+    <span class="n">first_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ada&quot;</span><span class="p">,</span> <span class="s2">&quot;Blair&quot;</span><span class="p">],</span>
+    <span class="n">last_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Nkemelu&quot;</span><span class="p">,</span> <span class="s2">&quot;Okafor&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>The org must already exist. Each athlete's sport id is the <code>sport_org_id</code>, which
+is the field the <code>sport_org_id</code> filter matches in <code>fetch_profiles</code>.</p>
+<h3 id="3-fetch-orgs-and-athlete-profiles">3. Fetch orgs and athlete profiles</h3>
+<p>The same fetch helpers your production app uses read the registry back.
+<code>fetch_org_options()</code> returns choices for a select input, and <code>fetch_profiles()</code>
+returns athletes, optionally filtered by organisation (<strong>only the
+<code>sport_org_id</code> filter is honoured in the sandbox</strong>).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">R</label><label for="__tabbed_5_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">fetch_org_options</span><span class="p">()</span><span class="w">   </span><span class="c1"># list(list(label = &quot;Rowing Canada&quot;, value = 123L), ...)</span>
+
+<span class="c1"># All dummy athletes</span>
+<span class="n">profiles</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_profiles</span><span class="p">()</span>
+
+<span class="c1"># Athletes for one organisation</span>
+<span class="n">profiles</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">sport_org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">))</span>
+
+<span class="c1"># A single athlete by id (NULL if none registered)</span>
+<span class="nf">fetch_profile</span><span class="p">(</span><span class="n">profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1L</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_org_options</span><span class="p">()</span>   <span class="c1"># {123: &quot;Rowing Canada&quot;, ...}</span>
+
+<span class="c1"># All dummy athletes</span>
+<span class="n">profiles</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profiles</span><span class="p">()</span>
+
+<span class="c1"># Athletes for one organisation</span>
+<span class="n">profiles</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sport_org_id&quot;</span><span class="p">:</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]})</span>
+
+<span class="c1"># A single athlete by id (None if none registered)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profile</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only warehouse endpoints are routed through <code>make_request()</code>. Calling
+<code>make_request("api/registration/...")</code> in the sandbox raises a 501 — use the
+<code>fetch_*</code> helpers above, which read the dummy registry instead.</p>
+</div>
+<h2 id="the-data-warehouse-workflow">The data warehouse workflow</h2>
+<p>The sandbox emulates three warehouse endpoints through the ordinary
+<code>make_request()</code> interface, validating records against a registered JSON schema
+and storing accepted payloads locally.</p>
+<h3 id="1-register-a-data-source-schema">1. Register a data source (schema)</h3>
+<div class="admonition note">
+<p class="admonition-title">You never handle the real data source uuid</p>
+<p>In production a CSIAPPS insider provisions the warehouse and supplies the
+source uuid through a <code>SOURCE_UUID</code> environment variable. Reference the
+source <strong>only</strong> from the environment — never a hard-coded uuid — so the same
+code runs in development and production. In development set <code>SOURCE_UUID</code>
+yourself to any throwaway placeholder; the sandbox accepts any identifying
+string.</p>
+</div>
+<p>The schema may be an object, a JSON string, or a path to a JSON file.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">R</label><label for="__tabbed_6_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">SOURCE_UUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dev-placeholder&quot;</span><span class="p">)</span>
+
+<span class="n">schema</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="s">&#39;{</span>
+<span class="s">  &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s">  &quot;required&quot;: [&quot;id&quot;, &quot;firstName&quot;, &quot;lastName&quot;],</span>
+<span class="s">  &quot;properties&quot;: {</span>
+<span class="s">    &quot;id&quot;:        {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s">    &quot;firstName&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s">    &quot;lastName&quot;:  {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s">    &quot;age&quot;:       {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class="s">    &quot;telephone&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;minLength&quot;: 10}</span>
+<span class="s">  }</span>
+<span class="s">}&#39;</span>
+
+<span class="nf">register_sandbox_schema</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">schema</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dev-placeholder&quot;</span>
+
+<span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;firstName&quot;</span><span class="p">,</span> <span class="s2">&quot;lastName&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;id&quot;</span><span class="p">:</span>        <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;firstName&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;lastName&quot;</span><span class="p">:</span>  <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;age&quot;</span><span class="p">:</span>       <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;telephone&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;minLength&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">csiapps</span><span class="o">.</span><span class="n">register_sandbox_schema</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">],</span> <span class="n">schema</span><span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>You can retrieve the registered schema back through the same call production
+uses — nested under <code>head_primary_definition.schema</code>, exactly like the real API
+(see the <a href="../rest-api/">REST API</a> article).</p>
+<h3 id="2-prepare-and-ingest-records">2. Prepare and ingest records</h3>
+<p>Records must comply with the schema; the sandbox validates every record before
+accepting it, stores accepted payloads in memory, and writes a JSON copy to disk
+for inspection.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">R</label><label for="__tabbed_7_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">records</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<span class="w">  </span><span class="nf">list</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;xxxx&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">firstName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;John&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lastName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Doe&quot;</span><span class="p">,</span><span class="w">   </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">30</span><span class="p">,</span><span class="w"> </span><span class="n">telephone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;1234567890&quot;</span><span class="p">),</span>
+<span class="w">  </span><span class="nf">list</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;yyyy&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">firstName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Jane&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lastName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Smith&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">25</span><span class="p">,</span><span class="w"> </span><span class="n">telephone</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0987654321&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">result</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">method</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<span class="w">    </span><span class="n">source</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">records</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="n">records</span><span class="p">,</span>
+<span class="w">    </span><span class="n">subject_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id&quot;</span>
+<span class="w">  </span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;xxxx&quot;</span><span class="p">,</span> <span class="s2">&quot;firstName&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;lastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Doe&quot;</span><span class="p">,</span>   <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;telephone&quot;</span><span class="p">:</span> <span class="s2">&quot;1234567890&quot;</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;yyyy&quot;</span><span class="p">,</span> <span class="s2">&quot;firstName&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane&quot;</span><span class="p">,</span> <span class="s2">&quot;lastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Smith&quot;</span><span class="p">,</span> <span class="s2">&quot;age&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span> <span class="s2">&quot;telephone&quot;</span><span class="p">:</span> <span class="s2">&quot;0987654321&quot;</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+    <span class="n">body</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="n">records</span><span class="p">,</span>
+        <span class="s2">&quot;subject_field&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Records that fail schema validation are <strong>rejected</strong> with an error naming which
+records failed and why — so you exercise the same failure handling as
+production:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">R</label><label for="__tabbed_8_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Missing the required `id` field -&gt; rejected before anything is stored</span>
+<span class="n">bad</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="n">firstName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;No&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">lastName</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Id&quot;</span><span class="p">))</span>
+<span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">method</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">body</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">),</span><span class="w"> </span><span class="n">records</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">bad</span><span class="p">,</span><span class="w"> </span><span class="n">subject_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="c1">#&gt; Error: ... validation failed for record(s) 1 ...</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Missing the required &quot;id&quot; field -&gt; rejected before anything is stored</span>
+<span class="n">bad</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;firstName&quot;</span><span class="p">:</span> <span class="s2">&quot;No&quot;</span><span class="p">,</span> <span class="s2">&quot;lastName&quot;</span><span class="p">:</span> <span class="s2">&quot;Id&quot;</span><span class="p">}]</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+    <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">],</span> <span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="n">bad</span><span class="p">,</span> <span class="s2">&quot;subject_field&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="c1"># RuntimeError: ... validation failed for record(s) 1 ...</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="3-pull-records-back">3. Pull records back</h3>
+<p>Retrieval is a <code>GET</code> on the data-records endpoint; the only required query
+parameter is <code>source_uuid</code>. Set pagination on to return all matching records
+(the sandbox returns a single page, mirroring the paginated shape).</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">R</label><label for="__tabbed_9_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">records</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">query</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">source_uuid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">)),</span>
+<span class="w">  </span><span class="n">paginate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">records</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+    <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source_uuid&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">]},</span>
+    <span class="n">paginate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Each record is wrapped in the same envelope the real API uses (<code>id</code>,
+<code>dataset_uuid</code>, <code>data</code>, <code>subject</code>, <code>created_at</code>, <code>updated_at</code>). If a record's
+<code>subject_field</code> value matches an athlete registered with <code>create_profile()</code>, the
+sandbox resolves <code>subject</code> to that athlete; otherwise it is null. Resolution
+happens at <strong>read time</strong>, so athletes registered <em>after</em> ingestion backfill on
+the next read.</p>
+<h2 id="inspecting-and-resetting">Inspecting and resetting</h2>
+<p>Accepted payloads are written as pretty-printed JSON, one folder per data
+source, so you can inspect the exact JSON that would have been sent to the API.
+Clear a single source or the whole sandbox to reset state between tests.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">R</label><label for="__tabbed_10_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">browse_sandbox</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">))</span><span class="w">  </span><span class="c1"># open the payload folder</span>
+<span class="nf">browse_sandbox</span><span class="p">()</span><span class="w">                           </span><span class="c1"># open the sandbox root</span>
+
+<span class="nf">clear_sandbox</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">))</span><span class="w">   </span><span class="c1"># clear one source</span>
+<span class="nf">clear_sandbox</span><span class="p">()</span><span class="w">                            </span><span class="c1"># clear everything</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">csiapps</span><span class="o">.</span><span class="n">browse_sandbox</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">])</span>  <span class="c1"># open the payload folder</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">browse_sandbox</span><span class="p">()</span>                           <span class="c1"># open the sandbox root</span>
+
+<span class="n">csiapps</span><span class="o">.</span><span class="n">clear_sandbox</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">])</span>   <span class="c1"># clear one source</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">clear_sandbox</span><span class="p">()</span>                            <span class="c1"># clear everything</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Sandbox state lasts only for the session.</p>
+<h2 id="a-complete-end-to-end-example">A complete end-to-end example</h2>
+<p>Registration and warehouse workflows in one script, all local, no network:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="11:2"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">R</label><label for="__tabbed_11_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">library</span><span class="p">(</span><span class="n">csiapps</span><span class="p">)</span>
+
+<span class="c1"># 1. (Optional) simulate login for a wrapped app&#39;s /me header</span>
+<span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">CSIAPPS_ACCESS_TOKEN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your-dev-access-token&quot;</span><span class="p">)</span>
+<span class="nf">set_institute</span><span class="p">(</span><span class="s">&quot;csiontario&quot;</span><span class="p">)</span>
+<span class="nf">check_secrets</span><span class="p">()</span>
+
+<span class="c1"># 2. Point the app at a placeholder source</span>
+<span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">SOURCE_UUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dev-placeholder&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. Seed the registration registry</span>
+<span class="n">org</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">create_sport_org</span><span class="p">(</span><span class="s">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="nf">create_profile</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">first_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Ada&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Blair&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cai&quot;</span><span class="p">),</span>
+<span class="w">                          </span><span class="n">last_names</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Nkemelu&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Okafor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Zhang&quot;</span><span class="p">))</span>
+
+<span class="c1"># 4. Read it back like production</span>
+<span class="n">athletes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">sport_org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">))</span>
+
+<span class="c1"># 5. Register a schema and ingest records keyed to those athletes</span>
+<span class="nf">register_sandbox_schema</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&#39;{</span>
+<span class="s">  &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s">  &quot;required&quot;: [&quot;athlete_id&quot;, &quot;weight&quot;],</span>
+<span class="s">  &quot;properties&quot;: {&quot;athlete_id&quot;: {&quot;type&quot;: &quot;integer&quot;}, &quot;weight&quot;: {&quot;type&quot;: &quot;number&quot;}}</span>
+<span class="s">}&#39;</span><span class="p">)</span>
+
+<span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">method</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<span class="w">    </span><span class="n">source</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">),</span>
+<span class="w">    </span><span class="n">records</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<span class="w">      </span><span class="nf">list</span><span class="p">(</span><span class="n">athlete_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">athletes</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">$</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">weight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">72.5</span><span class="p">),</span>
+<span class="w">      </span><span class="nf">list</span><span class="p">(</span><span class="n">athlete_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">athletes</span><span class="p">[[</span><span class="m">2</span><span class="p">]]</span><span class="o">$</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">weight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">68.1</span><span class="p">)</span>
+<span class="w">    </span><span class="p">),</span>
+<span class="w">    </span><span class="n">subject_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;athlete_id&quot;</span>
+<span class="w">  </span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># 6. Pull the records back; subjects resolve to the registered athletes</span>
+<span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">query</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">source_uuid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;SOURCE_UUID&quot;</span><span class="p">)),</span>
+<span class="w">  </span><span class="n">paginate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+
+<span class="c1"># 7. Reset when done</span>
+<span class="nf">clear_sandbox</span><span class="p">()</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">csiapps</span>
+
+<span class="c1"># 1. (Optional) simulate login for a wrapped app&#39;s /me header</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;CSIAPPS_ACCESS_TOKEN&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;your-dev-access-token&quot;</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">set_institute</span><span class="p">(</span><span class="s2">&quot;csiontario&quot;</span><span class="p">)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">check_secrets</span><span class="p">()</span>
+
+<span class="c1"># 2. Point the app at a placeholder source</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dev-placeholder&quot;</span>
+
+<span class="c1"># 3. Seed the registration registry</span>
+<span class="n">org</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">create_sport_org</span><span class="p">(</span><span class="s2">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">create_profile</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">first_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ada&quot;</span><span class="p">,</span> <span class="s2">&quot;Blair&quot;</span><span class="p">,</span> <span class="s2">&quot;Cai&quot;</span><span class="p">],</span>
+                       <span class="n">last_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Nkemelu&quot;</span><span class="p">,</span> <span class="s2">&quot;Okafor&quot;</span><span class="p">,</span> <span class="s2">&quot;Zhang&quot;</span><span class="p">])</span>
+
+<span class="c1"># 4. Read it back like production</span>
+<span class="n">athletes</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sport_org_id&quot;</span><span class="p">:</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]})</span>
+
+<span class="c1"># 5. Register a schema and ingest records keyed to those athletes</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">register_sandbox_schema</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">],</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;required&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;athlete_id&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;athlete_id&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;integer&quot;</span><span class="p">},</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">}},</span>
+<span class="p">})</span>
+
+<span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+    <span class="n">body</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;athlete_id&quot;</span><span class="p">:</span> <span class="n">athletes</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mf">72.5</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">&quot;athlete_id&quot;</span><span class="p">:</span> <span class="n">athletes</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="mf">68.1</span><span class="p">},</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;subject_field&quot;</span><span class="p">:</span> <span class="s2">&quot;athlete_id&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># 6. Pull the records back; subjects resolve to the registered athletes</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+    <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source_uuid&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;SOURCE_UUID&quot;</span><span class="p">]},</span>
+    <span class="n">paginate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 7. Reset when done</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">clear_sandbox</span><span class="p">()</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>When deployed, disable sandbox mode and let CSIAPPS set <code>SOURCE_UUID</code> to the real
+warehouse uuid — the app code above is <strong>unchanged</strong>. The schema registration in
+step 5 is development-only scaffolding; in production the schema already lives in
+the remote warehouse.</p>
+<h2 id="worked-example-integrating-third-party-vendor-data">Worked example: integrating third-party vendor data</h2>
+<p>A common real task is joining a <strong>third-party vendor's</strong> data — a testing
+platform, a wearable, a lab system — onto CSIAPPS athletes. CSI Ontario
+maintains an <strong>AMS_mapping</strong> data source whose records link each CSIAPPS athlete
+(<code>id</code>) to that athlete's profile in a vendor system (<code>vendor_profile_id</code>,
+<code>vendor_profile_name</code>). A consumer app reads AMS_mapping to translate the
+vendor's own ids into canonical CSIAPPS athlete ids.</p>
+<p>In production the mapping already lives in the warehouse. To build and test the
+consumer <strong>locally</strong>, you reproduce a miniature AMS_mapping source in the
+sandbox, then read it back and join — exactly as production will.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Steps 1–3 below (dummy athletes, schema, ingestion) are <strong>development-only
+scaffolding</strong>. In production the AMS_mapping source is already populated
+upstream; only the read-and-join in step 4 is real app code, and it ships
+<strong>unchanged</strong>. Give each source its own descriptively-named environment
+variable (here <code>AMS_MAPPING_UUID</code>) rather than a generic <code>SOURCE_UUID</code>.</p>
+</div>
+<h3 id="1-create-dummy-athletes-and-note-their-ids">1. Create dummy athletes and note their ids</h3>
+<p>The <code>id</code> column of your mapping must match real athlete ids. In the sandbox
+those come from <code>create_profile()</code>, which assigns ids in insertion order.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="12:2"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><div class="tabbed-labels"><label for="__tabbed_12_1">R</label><label for="__tabbed_12_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">Sys.setenv</span><span class="p">(</span><span class="n">AMS_MAPPING_UUID</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dev-ams-mapping&quot;</span><span class="p">)</span>
+
+<span class="n">org</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">create_sport_org</span><span class="p">(</span><span class="s">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="nf">create_profile</span><span class="p">(</span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">,</span>
+<span class="w">               </span><span class="n">first_names</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Ada&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Blair&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Cai&quot;</span><span class="p">),</span>
+<span class="w">               </span><span class="n">last_names</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Nkemelu&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Okafor&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Zhang&quot;</span><span class="p">))</span>
+
+<span class="n">athletes</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">sport_org_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">org</span><span class="o">$</span><span class="n">id</span><span class="p">))</span>
+<span class="nf">vapply</span><span class="p">(</span><span class="n">athletes</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="w"> </span><span class="n">p</span><span class="o">$</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="nf">integer</span><span class="p">(</span><span class="m">1</span><span class="p">))</span><span class="w">   </span><span class="c1"># e.g. 1 2 3</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;dev-ams-mapping&quot;</span>
+
+<span class="n">org</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">create_sport_org</span><span class="p">(</span><span class="s2">&quot;Rowing Canada&quot;</span><span class="p">)</span>
+<span class="n">csiapps</span><span class="o">.</span><span class="n">create_profile</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+                       <span class="n">first_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Ada&quot;</span><span class="p">,</span> <span class="s2">&quot;Blair&quot;</span><span class="p">,</span> <span class="s2">&quot;Cai&quot;</span><span class="p">],</span>
+                       <span class="n">last_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Nkemelu&quot;</span><span class="p">,</span> <span class="s2">&quot;Okafor&quot;</span><span class="p">,</span> <span class="s2">&quot;Zhang&quot;</span><span class="p">])</span>
+
+<span class="n">athletes</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profiles</span><span class="p">(</span><span class="n">filters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;sport_org_id&quot;</span><span class="p">:</span> <span class="n">org</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]})</span>
+<span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">athletes</span><span class="p">]</span>   <span class="c1"># e.g. [1, 2, 3]</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="2-register-the-ams_mapping-schema-and-ingest-the-mapping">2. Register the AMS_mapping schema and ingest the mapping</h3>
+<p>The mapping bridges two id systems: <code>id</code> is the CSIAPPS athlete id (matching the
+dummy profiles above), and <code>vendor_profile_id</code> is the athlete's id in <strong>your</strong>
+vendor system — a real value from your data. Keep every base mapping
+<code>active = true</code>, and ingest with <code>subject_field = "id"</code> so each mapping links to
+its CSIAPPS athlete. <code>register_sandbox_schema()</code> also accepts a path to a
+<code>.schema.json</code> file.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="13:2"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><div class="tabbed-labels"><label for="__tabbed_13_1">R</label><label for="__tabbed_13_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="nf">register_sandbox_schema</span><span class="p">(</span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;mapping.schema.json&quot;</span><span class="p">)</span>
+
+<span class="n">mapping</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
+<span class="w">  </span><span class="nf">list</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">vendor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VendorX&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vendor_profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VX-8841&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="n">vendor_profile_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Ada N.&quot;</span><span class="p">,</span><span class="w">   </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">),</span>
+<span class="w">  </span><span class="nf">list</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="p">,</span><span class="w"> </span><span class="n">vendor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VendorX&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vendor_profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VX-8842&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="n">vendor_profile_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Blair O.&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">),</span>
+<span class="w">  </span><span class="nf">list</span><span class="p">(</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="n">vendor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VendorX&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">vendor_profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;VX-9001&quot;</span><span class="p">,</span>
+<span class="w">       </span><span class="n">vendor_profile_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Cai Z.&quot;</span><span class="p">,</span><span class="w">   </span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">method</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;POST&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">body</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">),</span>
+<span class="w">              </span><span class="n">records</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapping</span><span class="p">,</span><span class="w"> </span><span class="n">subject_field</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;id&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">csiapps</span><span class="o">.</span><span class="n">register_sandbox_schema</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">],</span> <span class="s2">&quot;mapping.schema.json&quot;</span><span class="p">)</span>
+
+<span class="n">mapping</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="s2">&quot;VendorX&quot;</span><span class="p">,</span> <span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">:</span> <span class="s2">&quot;VX-8841&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;vendor_profile_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Ada N.&quot;</span><span class="p">,</span>   <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="s2">&quot;VendorX&quot;</span><span class="p">,</span> <span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">:</span> <span class="s2">&quot;VX-8842&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;vendor_profile_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Blair O.&quot;</span><span class="p">,</span> <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;vendor&quot;</span><span class="p">:</span> <span class="s2">&quot;VendorX&quot;</span><span class="p">,</span> <span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">:</span> <span class="s2">&quot;VX-9001&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;vendor_profile_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Cai Z.&quot;</span><span class="p">,</span>   <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+<span class="p">]</span>
+
+<span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/ingestion/primary/&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span>
+    <span class="n">body</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">],</span>
+          <span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">,</span> <span class="s2">&quot;subject_field&quot;</span><span class="p">:</span> <span class="s2">&quot;id&quot;</span><span class="p">},</span>
+<span class="p">)</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Keep <code>vendor_profile_id</code> a <strong>string</strong> (vendor id formats vary). If you are
+loading the mapping from a CSV, read that column as text before building the
+records.</p>
+<h3 id="3-read-the-mapping-back-and-join-your-vendor-data">3. Read the mapping back and join your vendor data</h3>
+<p>This is the only part that ships to production. Pull the AMS_mapping records,
+keep the active ones, and join your real vendor data onto them by
+<code>vendor_profile_id</code> — every vendor measurement now carries a canonical CSIAPPS
+<code>id</code>, which you can enrich with <code>fetch_profile()</code>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="14:2"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><div class="tabbed-labels"><label for="__tabbed_14_1">R</label><label for="__tabbed_14_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="n">resp</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">make_request</span><span class="p">(</span>
+<span class="w">  </span><span class="n">endpoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">query</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">source_uuid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">Sys.getenv</span><span class="p">(</span><span class="s">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">)),</span>
+<span class="w">  </span><span class="n">paginate</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+
+<span class="n">mapping</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">do.call</span><span class="p">(</span><span class="n">rbind</span><span class="p">,</span><span class="w"> </span><span class="nf">lapply</span><span class="p">(</span><span class="n">resp</span><span class="p">[[</span><span class="m">1</span><span class="p">]]</span><span class="o">$</span><span class="n">results</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">r</span><span class="p">)</span><span class="w"> </span><span class="nf">data.frame</span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w">                </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="o">$</span><span class="n">data</span><span class="o">$</span><span class="n">id</span><span class="p">,</span>
+<span class="w">  </span><span class="n">vendor_profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="o">$</span><span class="n">data</span><span class="o">$</span><span class="n">vendor_profile_id</span><span class="p">,</span>
+<span class="w">  </span><span class="n">active</span><span class="w">            </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="o">$</span><span class="n">data</span><span class="o">$</span><span class="n">active</span><span class="p">,</span>
+<span class="w">  </span><span class="n">stringsAsFactors</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span>
+<span class="p">)))</span>
+<span class="n">mapping</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">mapping</span><span class="p">[</span><span class="n">mapping</span><span class="o">$</span><span class="n">active</span><span class="p">,</span><span class="w"> </span><span class="p">]</span>
+
+<span class="c1"># your REAL third-party data, keyed by the vendor&#39;s own id</span>
+<span class="n">vendor_data</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">data.frame</span><span class="p">(</span>
+<span class="w">  </span><span class="n">vendor_profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;VX-8841&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;VX-8842&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;VX-9001&quot;</span><span class="p">),</span>
+<span class="w">  </span><span class="n">resting_hr</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="m">52</span><span class="p">,</span><span class="w"> </span><span class="m">58</span><span class="p">,</span><span class="w"> </span><span class="m">49</span><span class="p">),</span>
+<span class="w">  </span><span class="n">stringsAsFactors</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span>
+<span class="p">)</span>
+
+<span class="n">joined</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">merge</span><span class="p">(</span><span class="n">vendor_data</span><span class="p">,</span><span class="w"> </span><span class="n">mapping</span><span class="p">,</span><span class="w"> </span><span class="n">by</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;vendor_profile_id&quot;</span><span class="p">)</span>
+<span class="n">joined</span><span class="o">$</span><span class="n">athlete</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">vapply</span><span class="p">(</span><span class="n">joined</span><span class="o">$</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">p</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">fetch_profile</span><span class="p">(</span><span class="n">profile_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">i</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">paste</span><span class="p">(</span><span class="n">p</span><span class="o">$</span><span class="n">person</span><span class="o">$</span><span class="n">first_name</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="o">$</span><span class="n">person</span><span class="o">$</span><span class="n">last_name</span><span class="p">)</span>
+<span class="p">},</span><span class="w"> </span><span class="nf">character</span><span class="p">(</span><span class="m">1</span><span class="p">))</span>
+<span class="n">joined</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">resp</span> <span class="o">=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">make_request</span><span class="p">(</span>
+    <span class="s2">&quot;api/warehouse/data-records&quot;</span><span class="p">,</span>
+    <span class="n">query</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;source_uuid&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;AMS_MAPPING_UUID&quot;</span><span class="p">]},</span>
+    <span class="n">paginate</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">mapping</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">],</span>
+     <span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">],</span>
+     <span class="s2">&quot;active&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">][</span><span class="s2">&quot;active&quot;</span><span class="p">]}</span>
+    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resp</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;results&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;active&quot;</span><span class="p">]]</span>
+
+<span class="c1"># your REAL third-party data, keyed by the vendor&#39;s own id</span>
+<span class="n">vendor_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;VX-8841&quot;</span><span class="p">,</span> <span class="s2">&quot;VX-8842&quot;</span><span class="p">,</span> <span class="s2">&quot;VX-9001&quot;</span><span class="p">],</span>
+    <span class="s2">&quot;resting_hr&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">52</span><span class="p">,</span> <span class="mi">58</span><span class="p">,</span> <span class="mi">49</span><span class="p">],</span>
+<span class="p">})</span>
+
+<span class="n">joined</span> <span class="o">=</span> <span class="n">vendor_data</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">mapping</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;vendor_profile_id&quot;</span><span class="p">)</span>
+<span class="n">joined</span><span class="p">[</span><span class="s2">&quot;athlete&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([(</span><span class="n">p</span> <span class="o">:=</span> <span class="n">csiapps</span><span class="o">.</span><span class="n">fetch_profile</span><span class="p">(</span><span class="n">i</span><span class="p">))[</span><span class="s2">&quot;person&quot;</span><span class="p">][</span><span class="s2">&quot;first_name&quot;</span><span class="p">],</span>
+              <span class="n">p</span><span class="p">[</span><span class="s2">&quot;person&quot;</span><span class="p">][</span><span class="s2">&quot;last_name&quot;</span><span class="p">]])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">joined</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+<span class="p">]</span>
+<span class="n">joined</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">The <code>active</code> flag and append-only history</p>
+<p>AMS_mapping is append-only: a mapping is corrected or removed by appending a
+new record (a tombstone with <code>active = false</code>, plus any corrected record),
+and the most recent record per identity wins. In <strong>production</strong> the warehouse
+returns only currently-active mappings (filtered server-side). The
+<strong>sandbox returns every record you ingest</strong>, unfiltered — so if you ingest
+corrections while testing, reduce to the latest record per identity and keep
+the active ones yourself to mirror what production returns.</p>
+</div>
+<h3 id="going-to-production">Going to production</h3>
+<p>Disable sandbox mode and let CSIAPPS set <code>AMS_MAPPING_UUID</code> to the real source
+uuid. Steps 1–2 fall away entirely — the real AMS_mapping source is already
+populated upstream — and the step 3 read-and-join runs <strong>unchanged</strong>, now
+returning server-filtered active mappings whose subjects resolve against real
+registrations.</p>
+<h2 id="limitations">Limitations</h2>
+<p>The sandbox faithfully simulates the <em>schema contract</em>, not the warehouse.
+Anything that depends on server-side state will differ from production:</p>
+<ul>
+<li><strong>Validation parity is approximate.</strong> The sandbox validates records against
+  the JSON Schema only (R: Ajv via <code>jsonvalidate</code>; Python: <code>jsonschema</code>,
+  Draft 7), catching the most common failures. The real server additionally
+  enforces things the schema cannot express — <code>subject_field</code> resolution against
+  registered profiles, duplicate/dataset handling, and token permissions — and
+  validators differ on edge cases (e.g. <code>format</code> enforcement). Passing sandbox
+  validation is <em>necessary but not sufficient</em> for production acceptance.</li>
+<li><strong><code>subject</code> linkage is emulated only for registered athletes.</strong> On retrieval
+  the sandbox resolves each record's <code>subject_field</code> value against athletes
+  created with <code>create_profile()</code>, returning the matched athlete or null.
+  Production would reject an unresolved subject; the sandbox accepts it silently.</li>
+<li><strong>Only warehouse endpoints go through <code>make_request()</code>.</strong> Registration
+  endpoints raise a 501; use the <code>fetch_*</code> helpers. Any other endpoint is
+  unsupported.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "content.code.copy", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
