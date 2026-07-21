@@ -234,6 +234,88 @@ A runnable Python example is in
 [`examples/app.py`](https://github.com/CSIOntario/csiapps-py/blob/main/examples/app.py)
 (`shiny run --reload examples/app.py`).
 
+## Waiting for login
+
+In production, authentication is asynchronous: `server_wrapper()` redirects to
+CSIAPPS, and the user's access token only becomes available once they return and
+the token is exchanged. Any code that reads registration or warehouse data needs
+that token, so it cannot run at app startup — it has to wait until login
+completes.
+
+`csiapps` handles this for you. The token is stored **per session** (never in a
+process-global, so concurrent users never share one) and resolved reactively, so
+the data helpers gate themselves:
+
+- Called from a reactive context **before** login completes, `make_request()`,
+  `fetch_org_options()`, `fetch_profiles()`, and `fetch_profile()` **cancel
+  quietly** (they do not error) and the surrounding reactive **re-runs
+  automatically** once the token arrives.
+- Called outside a session (a script or the R console) with no token, they raise
+  a clear "not authenticated" error.
+
+The practical consequence: **fetch data from inside the server, not while
+building the UI.** A call placed in the UI definition runs once at startup, when
+no session and no token exist yet. Populate inputs from a reactive instead.
+
+=== "R"
+
+    ```r
+    server <- function(input, output, session) {
+      # Fetch org options once the token is available, then fill the dropdown.
+      # make_request() gates itself, so this observer simply re-runs on login.
+      org_list <- reactive({
+        make_request("api/registration/organization")[["results"]]
+      })
+      observeEvent(org_list(), {
+        updateSelectInput(session, "org",
+                          choices = vapply(org_list(), `[[`, "", "name"))
+      })
+    }
+    ```
+
+=== "Python"
+
+    ```python
+    def server(input, output, session):
+        # fetch_org_options() gates itself until login, so this effect just
+        # re-runs when the token arrives. Start the input's choices empty.
+        @reactive.effect
+        def _load_orgs():
+            ui.update_select("org", choices=csiapps.fetch_org_options())
+    ```
+
+### Gating your own work with `token_ready()`
+
+If you have work that must wait for login but does **not** itself call a
+`csiapps` data helper — for example, processing an uploaded file — guard it with
+`token_ready()`. It returns whether a token is available and, read inside a
+reactive context, re-fires the guard automatically once login completes.
+
+=== "R"
+
+    ```r
+    processed <- reactive({
+      req(token_ready())          # wait for login, then proceed
+      req(input$upload)
+      read.csv(input$upload$datapath)
+    })
+    ```
+
+=== "Python"
+
+    ```python
+    @reactive.calc
+    def processed():
+        req(csiapps.token_ready())   # wait for login, then proceed
+        req(input.upload())
+        return pd.read_csv(input.upload()[0]["datapath"])
+    ```
+
+!!! note
+    In sandbox mode the token comes from your environment at startup, so these
+    guards pass immediately and the gating is invisible — it only matters once
+    sandbox mode is off and a real, asynchronous login is involved.
+
 ## Sandbox mode
 
 The code above is written for production, but you do **not** need client
