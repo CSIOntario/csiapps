@@ -44,6 +44,7 @@ both — with two exceptions that are intentional and explained under
 |---|---|---|
 | Wrap app UI (navbar/footer/auth status) | `ui_wrapper()` | `ui_wrapper()` |
 | Wrap app server (OAuth2 / sandbox login) | `server_wrapper()` | `server_wrapper()` |
+| Reactive login guard | `token_ready()` | `token_ready()` |
 | Make globals visible to the server | `global_wrapper()` |  |
 
 ## Intentional divergences
@@ -78,6 +79,16 @@ deliberate hardening — same capability, adapted shape:
 - **`fetch_profiles()` pagination guard.** The Python port adds a `max_pages`
   bound with cycle detection and a truncation warning; the R version paginates
   until the API stops returning a `next` link. Python is a hardened superset.
+- **Per-session token storage.** Both packages store the logged-in user's access
+  token per session (never a process-global) and resolve it reactively, so
+  `make_request()` / `fetch_*()` gate themselves until login completes and
+  re-run automatically once it does. R keeps the token in a `reactiveVal` on
+  `session$userData`; Python keeps it in a `reactive.value` keyed on the session.
+  R additionally seeds the `CSIAPPS_ACCESS_TOKEN` environment variable with a
+  non-secret placeholder so older apps that guard on
+  `nzchar(Sys.getenv("CSIAPPS_ACCESS_TOKEN"))` keep working; Python needs no such
+  shim, as it never wrote the token to the environment. See
+  [Waiting for login](shiny-apps.md#waiting-for-login).
 
 ## Function reference
 

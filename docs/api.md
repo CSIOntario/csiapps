@@ -22,6 +22,7 @@ package, see the [R reference](https://csiontario.github.io/csiapps-r/reference/
 ::: csiapps.client.fetch_profiles
 ::: csiapps.client.fetch_profile
 ::: csiapps.client.flatten_profile
+::: csiapps.client.token_ready
 
 ## Sandbox
 
