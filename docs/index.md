@@ -17,7 +17,10 @@ The library has three layers:
   API so you can develop the full schema → ingest → retrieve workflow with no
   network and no credentials. **Sandbox mode is on by default.**
 - **App wrapper** — `ui_wrapper` / `server_wrapper` add a consistent CSI
-  navbar/footer and handle authentication for a Shiny app.
+  navbar/footer and handle authentication for a Shiny app. In Python these live
+  in the `csiapps.shiny` submodule and install with the `csiapps[shiny]` extra
+  (the API client and sandbox above depend on no web framework); see
+  [Migrating Python apps](migrating.md).
 
 ## Installation
 
@@ -31,8 +34,14 @@ The library has three layers:
 === "Python"
 
     ```bash
-    pip install csiapps
+    pip install csiapps            # core: ingestion + sandbox, no web framework
+    pip install 'csiapps[shiny]'   # add the Shiny app wrappers
+    pip install 'csiapps[dash]'    # add the Dash app wrappers
     ```
+
+    The two web frameworks are symmetric, mutually exclusive optional extras;
+    `import csiapps` pulls in neither. Upgrading a pre-0.3 Shiny app? See
+    [Migrating Python apps](migrating.md).
 
 ## Sandbox mode is the default
 
@@ -65,6 +74,8 @@ never hit the production warehouse by accident:
 
 - **[Shiny apps](shiny-apps.md)** — wrap an app's UI and server with CSIAPPS
   authentication and chrome.
+- **[Migrating Python apps](migrating.md)** — upgrade a pre-0.3 Python app to the
+  new `csiapps[shiny]` extra and `csiapps.shiny` imports.
 - **[REST API](rest-api.md)** — `make_request` and the registration helpers.
 - **[Sandbox mode](sandbox.md)** — the full local warehouse/registration
   workflow.

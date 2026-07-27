@@ -42,8 +42,8 @@ both — with two exceptions that are intentional and explained under
 
 | Capability | R | Python |
 |---|---|---|
-| Wrap app UI (navbar/footer/auth status) | `ui_wrapper()` | `ui_wrapper()` |
-| Wrap app server (OAuth2 / sandbox login) | `server_wrapper()` | `server_wrapper()` |
+| Wrap app UI (navbar/footer/auth status) | `ui_wrapper()` | `csiapps.shiny.ui_wrapper()` |
+| Wrap app server (OAuth2 / sandbox login) | `server_wrapper()` | `csiapps.shiny.server_wrapper()` |
 | Reactive login guard | `token_ready()` | `token_ready()` |
 | Make globals visible to the server | `global_wrapper()` |  |
 
@@ -60,6 +60,12 @@ concrete reason:
   rejects the nested dicts `fetch_profiles()` returns, so this helper flattens
   one profile into scalar fields for a table. R users flatten inline with
   `data.frame()` / `do.call(rbind, ...)`, so no dedicated helper ships in R.
+- **Python splits the framework wrappers into a submodule + optional extra.**
+  Since Python 0.3.0 the wrappers live in `csiapps.shiny` (Shiny) and
+  `csiapps.dash` (Dash), each behind its own extra (`csiapps[shiny]` /
+  `csiapps[dash]`); the core imports no web framework. R keeps `ui_wrapper()` /
+  `server_wrapper()` on the package namespace, since R has no equivalent notion of
+  optional install extras. See [Migrating Python apps](migrating.md).
 
 Beyond the public surface, a few behaviours differ by language idiom or as a
 deliberate hardening — same capability, adapted shape:

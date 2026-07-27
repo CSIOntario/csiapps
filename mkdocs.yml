@@ -52,6 +52,7 @@ nav:
       - Shiny apps: shiny-apps.md
       - REST API: rest-api.md
       - Sandbox mode: sandbox.md
+  - Migrating Python apps: migrating.md
   - Parity checklist: parity.md
   - Python reference: api.md
   - R reference ↗: https://csiontario.github.io/csiapps-r/reference/

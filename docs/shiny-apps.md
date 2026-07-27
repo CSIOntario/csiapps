@@ -4,6 +4,23 @@
 consistent CSI navbar/footer. The same wrappers exist in both languages:
 `ui_wrapper()` and `server_wrapper()`.
 
+!!! note "Python: install the `shiny` extra"
+    Since **0.3.0** the Python wrappers live in the `csiapps.shiny` submodule and
+    the Shiny dependency is optional. Install it with the extra and import from
+    the submodule:
+
+    ```bash
+    pip install 'csiapps[shiny]'
+    ```
+
+    ```python
+    from csiapps.shiny import ui_wrapper, server_wrapper
+    ```
+
+    Upgrading an app written for an earlier version? See
+    [Migrating Python apps](migrating.md). (The R package is unaffected —
+    `ui_wrapper()` and `server_wrapper()` are exported directly as before.)
+
 By default `csiapps` runs in **sandbox mode**, so a wrapped app can be developed
 and run locally *without* any OAuth client credentials — the login redirect is
 simulated (see [Sandbox mode](#sandbox-mode) below and the dedicated
@@ -158,11 +175,13 @@ login in sandbox mode).
 === "Python"
 
     ```python
+    from csiapps.shiny import ui_wrapper, server_wrapper
+
     # before
     app = App(app_ui, server)
 
     # after
-    app = App(csiapps.ui_wrapper(app_ui), csiapps.server_wrapper(server))
+    app = App(ui_wrapper(app_ui), server_wrapper(server))
     ```
 
 ## Full migrated app
@@ -206,12 +225,13 @@ login in sandbox mode).
     ```python
     from shiny import App, render, ui
     import csiapps
+    from csiapps.shiny import ui_wrapper, server_wrapper
 
     # CSIAPPS setup
     csiapps.set_institute("csiontario")
     csiapps.check_secrets()
 
-    app_ui = csiapps.ui_wrapper(
+    app_ui = ui_wrapper(
         ui.panel_title("Old Faithful Geyser Data"),
         ui.layout_sidebar(
             ui.sidebar(ui.input_slider("bins", "Number of bins:", 1, 50, 30)),
@@ -227,7 +247,7 @@ login in sandbox mode).
             ax.hist(waiting, bins=input.bins(), color="darkgray", edgecolor="white")
             return fig
 
-    app = App(app_ui, csiapps.server_wrapper(server))
+    app = App(app_ui, server_wrapper(server))
     ```
 
 A runnable Python example is in

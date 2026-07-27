@@ -1,9 +1,10 @@
 # Python API reference
 
-Everything exported from the top-level `csiapps` Python package. For the R
-package, see the [R reference](https://csiontario.github.io/csiapps-r/reference/)
-(pkgdown); for how the two map onto each other, see the
-[parity checklist](parity.md).
+The framework-independent API exported from the top-level `csiapps` Python
+package, plus the Shiny app wrappers in the `csiapps.shiny` submodule (installed
+with `pip install 'csiapps[shiny]'`). For the R package, see the
+[R reference](https://csiontario.github.io/csiapps-r/reference/) (pkgdown); for
+how the two map onto each other, see the [parity checklist](parity.md).
 
 ## Configuration
 
@@ -34,5 +35,7 @@ package, see the [R reference](https://csiontario.github.io/csiapps-r/reference/
 
 ## App wrappers
 
-::: csiapps.app.ui_wrapper
-::: csiapps.app.server_wrapper
+Import these from `csiapps.shiny` (requires the `csiapps[shiny]` extra).
+
+::: csiapps.shiny.ui_wrapper
+::: csiapps.shiny.server_wrapper
