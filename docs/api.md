@@ -1,8 +1,9 @@
 # Python API reference
 
 The framework-independent API exported from the top-level `csiapps` Python
-package, plus the Shiny app wrappers in the `csiapps.shiny` submodule (installed
-with `pip install 'csiapps[shiny]'`). For the R package, see the
+package, plus the app wrappers in the `csiapps.shiny` and `csiapps.dash`
+submodules (installed with `pip install 'csiapps[shiny]'` or `'csiapps[dash]'`).
+For the R package, see the
 [R reference](https://csiontario.github.io/csiapps-r/reference/) (pkgdown); for
 how the two map onto each other, see the [parity checklist](parity.md).
 
@@ -33,9 +34,17 @@ how the two map onto each other, see the [parity checklist](parity.md).
 ::: csiapps.sandbox.clear_sandbox
 ::: csiapps.sandbox.browse_sandbox
 
-## App wrappers
+## Shiny app wrappers
 
 Import these from `csiapps.shiny` (requires the `csiapps[shiny]` extra).
 
 ::: csiapps.shiny.ui_wrapper
 ::: csiapps.shiny.server_wrapper
+
+## Dash app wrappers
+
+Import these from `csiapps.dash` (requires the `csiapps[dash]` extra). See the
+[Dash apps](dash-apps.md) tutorial.
+
+::: csiapps.dash.attach
+::: csiapps.dash.layout_wrapper

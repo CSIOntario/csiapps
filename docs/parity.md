@@ -47,6 +47,16 @@ both — with two exceptions that are intentional and explained under
 | Reactive login guard | `token_ready()` | `token_ready()` |
 | Make globals visible to the server | `global_wrapper()` |  |
 
+## Dash app wrappers (Python only)
+
+Dash is a Python framework with no R counterpart, so these have no R column. See
+the [Dash apps](dash-apps.md) tutorial.
+
+| Capability | R | Python |
+|---|---|---|
+| Wrap app layout (navbar/footer/auth status) |  | `csiapps.dash.layout_wrapper()` |
+| Install the auth guard + OAuth routes |  | `csiapps.dash.attach()` |
+
 ## Intentional divergences
 
 These are the only differences in the public surface, and each exists for a

@@ -50,6 +50,7 @@ nav:
   - Home: index.md
   - Tutorials:
       - Shiny apps: shiny-apps.md
+      - Dash apps: dash-apps.md
       - REST API: rest-api.md
       - Sandbox mode: sandbox.md
   - Migrating Python apps: migrating.md

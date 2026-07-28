@@ -166,9 +166,10 @@ This is a strict improvement over ≤ 0.2.x, where every install dragged in Shin
 ## Building a Dash app instead?
 
 Dash has its own symmetric extra and submodule — `pip install 'csiapps[dash]'`
-and `from csiapps.dash import layout_wrapper, attach`. The two frameworks are
+and `from csiapps.dash import attach, layout_wrapper`. The two frameworks are
 mutually exclusive: a Shiny app installs only Shiny, a Dash app installs only
-Dash, and neither is required by the core.
+Dash, and neither is required by the core. See the
+[Dash apps](dash-apps.md) tutorial to build one.
 
 ## Checklist
 
