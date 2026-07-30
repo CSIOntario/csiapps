@@ -85,6 +85,8 @@ never hit the production warehouse by accident:
   workflow.
 - **[Parity checklist](parity.md)** — how each R function maps to its Python
   equivalent.
+- **[Releasing csiapps](releasing.md)** — for maintainers of the package itself:
+  how to validate and publish a change.
 
 ## Function reference
 

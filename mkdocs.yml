@@ -27,6 +27,8 @@ markdown_extensions:
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
 plugins:
   - search
   - mkdocstrings:
@@ -55,5 +57,6 @@ nav:
       - Sandbox mode: sandbox.md
   - Migrating Python apps: migrating.md
   - Parity checklist: parity.md
+  - Releasing csiapps: releasing.md
   - Python reference: api.md
   - R reference ↗: https://csiontario.github.io/csiapps-r/reference/
