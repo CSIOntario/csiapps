@@ -80,8 +80,8 @@ copy, and once again on the **deployed** app after the change is pushed.
 
     !!! tip "Confirm which copy you are testing"
         The app's Environment panel and the `selftest.R` summary both name the
-        loaded copy — `csiapps: 0.1.5 (local source: ../csiapps)` in dev, or
-        `csiapps: 0.1.5 (staging @ f4232db)` when it fell back to the installed
+        loaded copy — `csiapps: 0.1.6 (local source: ../csiapps)` in dev, or
+        `csiapps: 0.1.6 (staging @ 22f36ef)` when it fell back to the installed
         package. If you see a ref and commit where you expected local source,
         you are validating the wrong code. Set `CSIAPPS_SRC=""` deliberately
         when you *do* want to test the installed release.
@@ -260,9 +260,10 @@ deployed dummy apps at the unreleased code and redeploy them.
         The build happens server-side, so nothing in your terminal proves it
         picked up the pin — and every commit on a branch reports the same
         `Version`. The app's **Environment panel prints the ref and commit**
-        (`csiapps: 0.1.5 (staging @ f4232db)`); check it matches before you
+        (`csiapps: 0.1.6 (staging @ 22f36ef)`); check it matches before you
         trust anything else on the page. `Rscript selftest.R` prints the same
-        line.
+        line. On Connect Cloud, the app reads this provenance from
+        `manifest.json` when the installed package metadata omits it.
 
     !!! note "Nothing to revert afterwards"
         Unlike the Python flow, you never hand-edit a dependency file. The
