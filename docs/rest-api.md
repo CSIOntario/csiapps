@@ -24,10 +24,19 @@ To reach the **real** API you need an access token in `CSIAPPS_ACCESS_TOKEN`
 The simplest endpoint is `/api/csiauth/me/`, which reports the authenticated
 user. A successful response means your token is valid. Set your institute first.
 
+| Institute value | Display name | API host |
+|---|---|---|
+| `csipacific` | CSI Pacific | `https://apps.csipacific.ca` |
+| `csiontario` | CSI Ontario | `https://apps.csiontario.ca` |
+| `csiatlantic` | CSI Atlantic | `https://apps.csiatlantic.ca` |
+
+The Atlantic host is planned for the future service; configuring it before
+that service is available will fail only when a live request is attempted.
+
 === "R"
 
     ```r
-    set_institute("csiontario")   # or "csipacific" (the default)
+    set_institute("csiontario")   # also "csiatlantic"; "csipacific" is the default
 
     result <- make_request(
       endpoint = "api/csiauth/me/",
@@ -38,7 +47,7 @@ user. A successful response means your token is valid. Set your institute first.
 === "Python"
 
     ```python
-    csiapps.set_institute("csiontario")   # or "csipacific" (the default)
+    csiapps.set_institute("csiontario")   # also "csiatlantic"; "csipacific" is the default
 
     result = csiapps.make_request(
         "api/csiauth/me/",

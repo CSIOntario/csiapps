@@ -67,7 +67,7 @@ fail fast on a misconfigured deployment.
 ```python
 import csiapps
 
-# one of "csiontario" or "csipacific" (the default)
+# "csiontario", "csiatlantic", or "csipacific" (the default)
 csiapps.set_institute("csiontario")
 
 # outside sandbox mode this raises if a required variable is missing

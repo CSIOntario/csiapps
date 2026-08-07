@@ -98,14 +98,14 @@ target:
 === "R"
 
     ```r
-    # one of "csiontario" or "csipacific" (the default)
+    # "csiontario", "csiatlantic", or "csipacific" (the default)
     set_institute("csiontario")
     ```
 
 === "Python"
 
     ```python
-    # one of "csiontario" or "csipacific" (the default)
+    # "csiontario", "csiatlantic", or "csipacific" (the default)
     csiapps.set_institute("csiontario")
     ```
 
