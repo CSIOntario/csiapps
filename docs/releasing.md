@@ -138,7 +138,7 @@ copy, and once again on the **deployed** app after the change is pushed.
     pip install -e '../csiapps-py[dash]'     # dummy-python-dash
     ```
 
-    The Shiny app's Environment panel and sandbox summary should report
+    Each app's Environment panel and sandbox summary should report
     `csiapps: <version> (local editable)`. On a deployed Git install they report
     the requested ref and exact resolved commit instead.
 
@@ -304,11 +304,12 @@ deployed dummy apps at the unreleased code and redeploy them.
 
     Keep each applicable dummy app permanently on **`staging`**. The canary
     must never follow `main` or a PyPI version: `staging` is where new changes
-    are exercised before they reach either. For the Shiny canary,
-    `requirements.txt` contains:
+    are exercised before they reach either. Each canary's `requirements.txt`
+    uses its framework extra:
 
     ```text
     csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+    csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
     ```
 
     Regenerate and commit the app's `manifest.json`, then push the dummy-app
@@ -317,7 +318,7 @@ deployed dummy apps at the unreleased code and redeploy them.
     ref and resolved commit.
 
     !!! warning "Confirm the deployed package commit"
-        The Shiny app's Environment panel must show
+        Each app's Environment panel must show
         `csiapps: <version> (staging @ <commit>)`. Match that commit to the head
         of `csiapps-py@staging` before trusting the green boards. A version alone
         is not enough because every staging commit can carry the same version.
@@ -409,10 +410,11 @@ the Warehouse round-trip works.
        behaviour are hand-written and must be edited. Pushing to `main` there
        redeploys the site.
     4. **Validate the published artifact and redeploy production consumers.**
-       Install `csiapps[shiny]==<new version>` in a clean temporary environment
-       and run the dummy app's sandbox self-test from that environment. Then
-       update each production app deliberately. Do **not** change the dummy
-       app's committed requirement: it stays on `staging` continuously.
+       Install both `csiapps[shiny]==<new version>` and
+       `csiapps[dash]==<new version>` in clean temporary environments and run
+       the corresponding dummy app's sandbox self-test from each. Then update
+       each production app deliberately. Do **not** change the dummy apps'
+       committed requirements: they stay on `staging` continuously.
 
 ## Checklist
 
