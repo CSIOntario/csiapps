@@ -29,8 +29,8 @@ regression harnesses:
     - [`dummy-python-dash`](https://github.com/CSIOntario/dummy-python-dash) —
       the Dash canary.
 
-Each exercises the whole `csiapps` public surface. A **clean render plus two
-green self-test boards** (sandbox + live) is our evidence that a change is safe.
+Together they exercise the relevant `csiapps` public surface. A **clean render
+plus two green self-test boards** (sandbox + live) is our evidence that a change is safe.
 Every release runs the dummy apps twice: once **locally** against the working
 copy, and once again on the **deployed** app after the change is pushed.
 
@@ -57,11 +57,13 @@ copy, and once again on the **deployed** app after the change is pushed.
 
 === "Python"
 
-    Edit `csiapps-py` and run its own test suite:
+    Edit `csiapps-py` and run its own gates:
 
     ```bash
-    cd csiapps-py
-    uv run pytest            # or: .venv/bin/python -m pytest
+    uv run pytest
+    uv run ruff check .
+    uv build
+    uvx twine check --strict dist/*
     ```
 
     Both framework test groups skip themselves when their extra is absent; run
@@ -135,6 +137,10 @@ copy, and once again on the **deployed** app after the change is pushed.
     pip install -e '../csiapps-py[shiny]'    # dummy-python-shiny
     pip install -e '../csiapps-py[dash]'     # dummy-python-dash
     ```
+
+    The Shiny app's Environment panel and sandbox summary should report
+    `csiapps: <version> (local editable)`. On a deployed Git install they report
+    the requested ref and exact resolved commit instead.
 
     There are three gates. The first is cheap and unconditional; the other two
     are the same live suite reached two different ways.
@@ -226,8 +232,22 @@ Run each app in **sandbox** mode (the default) at minimum; run it in
 
 === "Python"
 
-    Push the branch / merge to `main`. Nothing is published to PyPI yet — this
-    only makes the change available from source.
+    Push the branch, then merge it into **`staging`**, which is the integration
+    ref consumed by the deployed dummy apps:
+
+    ```bash
+    git push -u origin fix/my-change
+    # open a PR against staging, review, merge
+    ```
+
+    Bump `pyproject.toml` and `src/csiapps/__init__.py` on `staging` before the
+    deployed gate. The exact commit that passes step 4 must be the commit later
+    fast-forwarded to `main`, tagged, and published to PyPI.
+
+    Production apps remain pinned to published PyPI versions, so merging an
+    unreleased change to `staging` cannot move them. Keeping `main`
+    release-aligned also prevents the Python API reference from documenting
+    unreleased code, because this site installs `csiapps-py@main` when it builds.
 
 ### 4. Re-validate on the *deployed* dummy apps
 
@@ -283,15 +303,23 @@ deployed dummy apps at the unreleased code and redeploy them.
 
 === "Python"
 
-    - Temporarily install `csiapps` **from `main`** rather than the pinned
-      release — in the dummy app's `requirements.txt`:
+    Point each applicable dummy app at **`staging`** rather than the pinned
+    release. For the Shiny canary, `requirements.txt` contains:
 
-      ```text
-      # pre-release validation only; revert to the pinned version before step 5
-      csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@main
-      ```
+    ```text
+    csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+    ```
 
-    - Redeploy the dummy app (Posit Connect) and open it.
+    Regenerate and commit the app's `manifest.json`, then push the dummy-app
+    branch tracked by Posit Connect. The manifest records app-file checksums;
+    the installed package's standard `direct_url.json` records the requested
+    ref and resolved commit.
+
+    !!! warning "Confirm the deployed package commit"
+        The Shiny app's Environment panel must show
+        `csiapps: <version> (staging @ <commit>)`. Match that commit to the head
+        of `csiapps-py@staging` before trusting the green boards. A version alone
+        is not enough because every staging commit can carry the same version.
 
 Open the deployed app and confirm: login returns "Signed in as …", both
 self-test boards are green in production, Registry shows real orgs/athletes, and
@@ -353,16 +381,24 @@ the Warehouse round-trip works.
 
 === "Python"
 
-    1. **Bump the version** in `pyproject.toml` (and `__version__`), following
-       semver — a breaking public-surface change is a major/minor bump, not a
-       patch.
-    2. **Publish to PyPI.** There is no release workflow in the repo yet, so
-       this is manual: tag the commit, build, and upload.
+    1. **Fast-forward `staging` into `main`.** If this fails, `main` moved and
+       the combined commit has not passed the deployed gate; reconcile the
+       branches and repeat step 4.
+
+        ```bash
+        git checkout main && git merge --ff-only staging && git push
+        ```
+
+       The version was already bumped in step 3, so no source file changes here.
+
+    2. **Publish the validated commit to PyPI.** There is no release workflow in
+       the repo yet, so this remains a manual tag, build, validation, and upload.
 
         ```bash
         git tag v<new version> && git push --tags
-        uv build                     # or: python -m build
-        uv publish                   # or: python -m twine upload dist/*
+        uv build
+        uvx twine check --strict dist/*
+        uv publish
         ```
 
     3. **Update the docs** —
@@ -371,10 +407,11 @@ the Warehouse round-trip works.
        the tutorials, the [parity checklist](parity.md), and any changed
        behaviour are hand-written and must be edited. Pushing to `main` there
        redeploys the site.
-    4. **Bump the pin and redeploy consumers.** Change
-       `csiapps[...]==<new version>` in the dummy apps (revert the step-4 git
-       line) **and** in every dependent app, then redeploy. The dummy apps
-       should be green one more time on the pinned release.
+    4. **Validate the published artifact and redeploy consumers.** Change the
+       dummy app to `csiapps[shiny]==<new version>`, regenerate its manifest,
+       and redeploy. After it is green on the PyPI artifact, update each
+       production app deliberately. At the start of the next release candidate,
+       point the dummy app back to `staging` in step 4.
 
 ## Checklist
 
@@ -409,9 +446,14 @@ the Warehouse round-trip works.
     - [ ] Each dummy app renders and both boards are green locally, in
           production mode.
     - [ ] Any `selftest.py --live` run checked for skipped rows, not just exit 0.
-    - [ ] Change pushed to `csiapps-py@main`.
-    - [ ] Deployed dummy apps green in production (installed from `main`).
-    - [ ] Version bumped; published to PyPI.
+    - [ ] Change merged into **`csiapps-py@staging`**, not `main`.
+    - [ ] Version bumped in both files before the deployed gate.
+    - [ ] Dummy-app manifest regenerated and pushed with its applicable
+          `csiapps[...] @ git+...@staging` requirement.
+    - [ ] Deployed dummy apps green in production and showing the exact staging
+          commit in their Environment panel.
+    - [ ] `staging` fast-forwarded into `main`; validated commit tagged, built,
+          checked, and published to PyPI.
     - [ ] Docs updated (tutorials / parity / behaviour notes).
     - [ ] `csiapps==<version>` pin bumped and redeployed in the dummy apps and
           every dependent app.
@@ -428,30 +470,23 @@ worth knowing before you run the loop in the other language:
 | Regenerate docs from source | `devtools::document()` commits `man/` + `NAMESPACE` | not needed — mkdocstrings reads the source |
 | Getting the working copy into the dummy app | automatic, `pkgload::load_all("../csiapps")` | `pip install -e '../csiapps-py[extra]'` |
 | Env vars for the CLI self-test | `.Renviron`, auto-loaded | must be exported in the shell |
-| Integration branch | **`staging`** — see below | none; `main` is the integration branch |
+| Integration branch | **`staging`** | **`staging`** |
 | Deploy pin | generated `manifest.json`, pins an exact `GithubSHA1` | hand-edited `requirements.txt` line |
-| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | temporary `git+…@main` line that **must** be reverted |
+| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | temporary `git+…@staging` line; manifest regenerated |
 | Publishing the deploy | `git push` the manifest; Connect Cloud rebuilds | redeploy the app |
 | Distribution | GitHub — no registry | PyPI |
-| Effect of merging to `main` | **publishes** to every `install_github()` consumer, and to the pkgdown site | inert until `uv publish` |
+| Effect of merging to `main` | **publishes** to every `install_github()` consumer, and to the pkgdown site | updates source/API docs; package consumers wait for `uv publish` |
 | Version file | `DESCRIPTION` | `pyproject.toml` + `__version__` |
-| Version bumped at | step 3, on `staging` | step 5 |
+| Version bumped at | step 3, on `staging` | step 3, on `staging` |
 | Release notes | GitHub Release body | tag / PyPI release notes |
 | Reference docs | separate [pkgdown site](https://csiontario.github.io/csiapps-r/), auto-built from `main` | [mkdocstrings](api.md), inside this site |
 
-!!! question "Why does only R have a `staging` branch?"
-    Because in R the git ref *is* the distribution channel. Merging to `main`
-    publishes to every `install_github()` consumer and rebuilds the public
-    function reference, so `main` cannot double as the place unvalidated work
-    lands — `staging` is that place.
-
-    Python already has the separation for free: merging to `csiapps-py@main`
-    publishes nothing. `uv publish` is a deliberate, separate act, so `main` is
-    a safe integration branch and a staging branch would add ceremony without
-    removing a risk.
-
-    The asymmetry is intentional. If the Python flow ever gains an
-    auto-publish-on-merge step, revisit it.
+!!! question "Why does Python use `staging` when PyPI is already a gate?"
+    PyPI protects production package consumers, but it does not provide a
+    deployed canary. The Python `staging` branch lets Posit Connect exercise an
+    unreleased commit while production apps remain pinned to PyPI. It also
+    keeps `main` aligned with releases, which matters because the official
+    Python API reference is built from `csiapps-py@main`.
 
 ## Notes
 
