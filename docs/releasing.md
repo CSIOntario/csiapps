@@ -285,10 +285,9 @@ deployed dummy apps at the unreleased code and redeploy them.
         line. On Connect Cloud, the app reads this provenance from
         `manifest.json` when the installed package metadata omits it.
 
-    !!! note "Nothing to revert afterwards"
-        Unlike the Python flow, you never hand-edit a dependency file. The
-        manifest is generated, so step 5 simply regenerates it from the release
-        tag instead of `staging`.
+    !!! note "Nothing to edit by hand"
+        You never hand-edit a dependency file. The manifest is generated, so
+        step 5 simply regenerates it from the release tag instead of `staging`.
 
     Regenerate the manifest whenever **any** app file changes, not just when
     `csiapps` moves — it records a checksum per file.
@@ -303,8 +302,10 @@ deployed dummy apps at the unreleased code and redeploy them.
 
 === "Python"
 
-    Point each applicable dummy app at **`staging`** rather than the pinned
-    release. For the Shiny canary, `requirements.txt` contains:
+    Keep each applicable dummy app permanently on **`staging`**. The canary
+    must never follow `main` or a PyPI version: `staging` is where new changes
+    are exercised before they reach either. For the Shiny canary,
+    `requirements.txt` contains:
 
     ```text
     csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
@@ -407,11 +408,11 @@ the Warehouse round-trip works.
        the tutorials, the [parity checklist](parity.md), and any changed
        behaviour are hand-written and must be edited. Pushing to `main` there
        redeploys the site.
-    4. **Validate the published artifact and redeploy consumers.** Change the
-       dummy app to `csiapps[shiny]==<new version>`, regenerate its manifest,
-       and redeploy. After it is green on the PyPI artifact, update each
-       production app deliberately. At the start of the next release candidate,
-       point the dummy app back to `staging` in step 4.
+    4. **Validate the published artifact and redeploy production consumers.**
+       Install `csiapps[shiny]==<new version>` in a clean temporary environment
+       and run the dummy app's sandbox self-test from that environment. Then
+       update each production app deliberately. Do **not** change the dummy
+       app's committed requirement: it stays on `staging` continuously.
 
 ## Checklist
 
@@ -455,8 +456,9 @@ the Warehouse round-trip works.
     - [ ] `staging` fast-forwarded into `main`; validated commit tagged, built,
           checked, and published to PyPI.
     - [ ] Docs updated (tutorials / parity / behaviour notes).
-    - [ ] `csiapps==<version>` pin bumped and redeployed in the dummy apps and
-          every dependent app.
+    - [ ] Published `csiapps==<version>` artifact validated in a clean
+          environment and the pin bumped in every production app; dummy apps
+          remain on `git+...@staging`.
 
 ## How the two release processes differ
 
@@ -472,7 +474,7 @@ worth knowing before you run the loop in the other language:
 | Env vars for the CLI self-test | `.Renviron`, auto-loaded | must be exported in the shell |
 | Integration branch | **`staging`** | **`staging`** |
 | Deploy pin | generated `manifest.json`, pins an exact `GithubSHA1` | hand-edited `requirements.txt` line |
-| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | temporary `git+…@staging` line; manifest regenerated |
+| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | permanent `git+…@staging` line; manifest regenerated |
 | Publishing the deploy | `git push` the manifest; Connect Cloud rebuilds | redeploy the app |
 | Distribution | GitHub — no registry | PyPI |
 | Effect of merging to `main` | **publishes** to every `install_github()` consumer, and to the pkgdown site | updates source/API docs; package consumers wait for `uv publish` |
@@ -486,7 +488,9 @@ worth knowing before you run the loop in the other language:
     deployed canary. The Python `staging` branch lets Posit Connect exercise an
     unreleased commit while production apps remain pinned to PyPI. It also
     keeps `main` aligned with releases, which matters because the official
-    Python API reference is built from `csiapps-py@main`.
+    Python API reference is built from `csiapps-py@main`. The dummy apps remain
+    on `staging` after a release so the next staged change reaches them
+    automatically; they never follow `main` or a PyPI pin.
 
 ## Notes
 
