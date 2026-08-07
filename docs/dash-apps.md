@@ -184,10 +184,12 @@ Dash apps register, so a migrating app keeps its registration unchanged.
 ## The session secret key
 
 Dash stores the access token in a **Flask session cookie**, and `CSIAPPS_SECRET_KEY`
-signs that cookie. It is **one fixed value for the whole app** — not per-user and
-not per-session — and it must stay **stable across restarts and workers**, or
-users are thrown into a login loop. `attach()` raises at startup in production if
-it is missing or shorter than 32 characters. Generate one once:
+signs that cookie. Generate a different key for each deployed Dash app, then keep
+that app's value **stable across restarts and workers**. It is not per-user or
+per-session, and it is not a package-wide key. Reusing one key across unrelated
+apps only increases the impact of a leak. `attach()` raises at startup in
+production if the key is missing or shorter than 32 characters. Generate it once
+per app:
 
 ```bash
 python -c "import secrets; print(secrets.token_urlsafe(48))"
@@ -289,3 +291,12 @@ server = app.server   # gunicorn app:server  /  Posit Connect entrypoint "app:se
 
 On Posit Connect the content type is **`python-dash`**; generate the manifest
 with `rsconnect write-manifest dash .`.
+
+!!! warning "Let CSIAPPS, not Posit, handle viewer authentication"
+    In Posit Connect Cloud, enable **Public Access** for the content. This only
+    removes Posit's viewer-login gate; `attach()` still protects the app and
+    sends unauthenticated visitors to CSI Access Portal. If Public Access is
+    disabled, visitors see a Posit login before the Dash process runs and the
+    CSI OAuth flow cannot be tested. Use the app's stable public URL in
+    `CSIAPPS_REDIRECT_URI`; a private-link URL is not a substitute for the
+    registered OAuth redirect.

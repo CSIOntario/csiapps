@@ -323,6 +323,13 @@ deployed dummy apps at the unreleased code and redeploy them.
         of `csiapps-py@staging` before trusting the green boards. A version alone
         is not enough because every staging commit can carry the same version.
 
+    !!! info "Connect Cloud access setting"
+        Enable **Public Access** on each dummy app's Connect Cloud content so
+        visitors reach the app and `csiapps` can redirect them to CSI Access
+        Portal. If it is disabled, Connect shows its own Posit login before the
+        app starts; that does not validate CSI authentication. The app remains
+        protected by its Shiny or Dash authentication wrapper.
+
 Open the deployed app and confirm: login returns "Signed in as …", both
 self-test boards are green in production, Registry shows real orgs/athletes, and
 the Warehouse round-trip works.
