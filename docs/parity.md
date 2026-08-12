@@ -57,6 +57,15 @@ the [Dash apps](dash-apps.md) tutorial.
 | Wrap app layout (navbar/footer/auth status) |  | `csiapps.dash.layout_wrapper()` |
 | Install the auth guard + OAuth routes |  | `csiapps.dash.attach()` |
 
+## Streamlit app wrappers (Python only)
+
+Streamlit is a Python framework with no R counterpart. See the
+[Streamlit apps](streamlit-apps.md) tutorial.
+
+| Capability | R | Python |
+|---|---|---|
+| Authenticate, then render navbar, footer, auth status, and sandbox banner |  | `csiapps.streamlit.page_wrapper()` |
+
 ## Intentional divergences
 
 These are the only differences in the public surface, and each exists for a
@@ -72,8 +81,9 @@ concrete reason:
   `data.frame()` / `do.call(rbind, ...)`, so no dedicated helper ships in R.
 - **Python splits the framework wrappers into a submodule + optional extra.**
   Since Python 0.3.0 the wrappers live in `csiapps.shiny` (Shiny) and
-  `csiapps.dash` (Dash), each behind its own extra (`csiapps[shiny]` /
-  `csiapps[dash]`); the core imports no web framework. R keeps `ui_wrapper()` /
+  `csiapps.dash` (Dash), and `csiapps.streamlit` (Streamlit), each behind its
+  own extra (`csiapps[shiny]` / `csiapps[dash]` / `csiapps[streamlit]`); the
+  core imports no web framework. R keeps `ui_wrapper()` /
   `server_wrapper()` on the package namespace, since R has no equivalent notion of
   optional install extras. See [Migrating Python apps](migrating.md).
 
@@ -99,7 +109,10 @@ deliberate hardening — same capability, adapted shape:
   token per session (never a process-global) and resolve it reactively, so
   `make_request()` / `fetch_*()` gate themselves until login completes and
   re-run automatically once it does. R keeps the token in a `reactiveVal` on
-  `session$userData`; Python keeps it in a `reactive.value` keyed on the session.
+  `session$userData`; Python Shiny keeps it in a `reactive.value` keyed on the
+  session, and Streamlit keeps it in its server-side session, while Dash uses a
+  signed, HTTP-only per-browser cookie. Streamlit's browser cookie contains only
+  a short-lived OAuth nonce.
   R additionally seeds the `CSIAPPS_ACCESS_TOKEN` environment variable with a
   non-secret placeholder so older apps that guard on
   `nzchar(Sys.getenv("CSIAPPS_ACCESS_TOKEN"))` keep working; Python needs no such

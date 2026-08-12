@@ -20,8 +20,8 @@ Shiny wrappers. The two entry points are `attach()` and `layout_wrapper()`.
     from csiapps.dash import attach, layout_wrapper
     ```
 
-    The two web frameworks are mutually exclusive extras — a Dash app installs
-    only Dash, a Shiny app only Shiny — and the core (`make_request`, the
+    The web frameworks are independent extras — a Dash app installs only Dash,
+    a Shiny app only Shiny, and a Streamlit app only Streamlit — while the core (`make_request`, the
     `fetch_*` helpers, the sandbox) imports neither.
 
 By default `csiapps` runs in **sandbox mode**, so a wrapped app develops and runs

@@ -1,8 +1,8 @@
 # Python API reference
 
 The framework-independent API exported from the top-level `csiapps` Python
-package, plus the app wrappers in the `csiapps.shiny` and `csiapps.dash`
-submodules (installed with `pip install 'csiapps[shiny]'` or `'csiapps[dash]'`).
+package, plus the app wrappers in the `csiapps.shiny`, `csiapps.dash`, and
+`csiapps.streamlit` submodules (installed with the matching optional extra).
 For the R package, see the
 [R reference](https://csiontario.github.io/csiapps-r/reference/) (pkgdown); for
 how the two map onto each other, see the [parity checklist](parity.md).
@@ -48,3 +48,10 @@ Import these from `csiapps.dash` (requires the `csiapps[dash]` extra). See the
 
 ::: csiapps.dash.attach
 ::: csiapps.dash.layout_wrapper
+
+## Streamlit app wrappers
+
+Import these from `csiapps.streamlit` (requires the `csiapps[streamlit]` extra).
+See the [Streamlit apps](streamlit-apps.md) tutorial.
+
+::: csiapps.streamlit.page_wrapper
