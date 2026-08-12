@@ -150,7 +150,7 @@ A script that only ingests or reads warehouse data — no UI at all — no longe
 pulls in a web framework. Keep the bare install:
 
 ```bash
-pip install csiapps        # no Shiny, no Dash
+pip install csiapps        # no Shiny, Dash, or Streamlit
 ```
 
 ```python
@@ -163,13 +163,13 @@ records = csiapps.make_request("api/warehouse/data-records",
 
 This is a strict improvement over ≤ 0.2.x, where every install dragged in Shiny.
 
-## Building a Dash app instead?
+## Building a Dash or Streamlit app instead?
 
-Dash has its own symmetric extra and submodule — `pip install 'csiapps[dash]'`
-and `from csiapps.dash import attach, layout_wrapper`. The two frameworks are
-mutually exclusive: a Shiny app installs only Shiny, a Dash app installs only
-Dash, and neither is required by the core. See the
-[Dash apps](dash-apps.md) tutorial to build one.
+Dash and Streamlit have their own symmetric extras and submodules. A Streamlit
+app installs `csiapps[streamlit]` and imports `page_wrapper` from
+`csiapps.streamlit`. Each app installs only its framework and none is required
+by the core. See the [Dash apps](dash-apps.md) or
+[Streamlit apps](streamlit-apps.md) tutorial.
 
 ## Checklist
 

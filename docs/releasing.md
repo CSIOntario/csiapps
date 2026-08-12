@@ -9,7 +9,8 @@ language with the tabs; the choice sticks across the whole page.
 !!! info "This page is for maintainers of the `csiapps` packages"
     If you are *using* `csiapps` to build an app, you want the tutorials
     instead: [Shiny apps](shiny-apps.md), [Dash apps](dash-apps.md),
-    [Sandbox mode](sandbox.md), and the [REST API](rest-api.md).
+    [Streamlit apps](streamlit-apps.md), [Sandbox mode](sandbox.md), and the
+    [REST API](rest-api.md).
 
 ## The canary principle
 
@@ -28,6 +29,8 @@ regression harnesses:
       the Shiny canary.
     - [`dummy-python-dash`](https://github.com/CSIOntario/dummy-python-dash) —
       the Dash canary.
+    - [`dummy-python-streamlit`](https://github.com/CSIOntario/dummy-python-streamlit) —
+      the native Streamlit canary for Posit Connect Cloud.
 
 Together they exercise the relevant `csiapps` public surface. A **clean render
 plus two green self-test boards** (sandbox + live) is our evidence that a change is safe.
@@ -66,8 +69,8 @@ copy, and once again on the **deployed** app after the change is pushed.
     uvx twine check --strict dist/*
     ```
 
-    Both framework test groups skip themselves when their extra is absent; run
-    the full matrix if you touched shared code.
+    Framework test groups skip themselves when their extra is absent; run the
+    full Shiny, Dash, and Streamlit matrix if you touched shared code.
 
 ### 2. Validate against the dummy apps locally
 
@@ -129,13 +132,14 @@ copy, and once again on the **deployed** app after the change is pushed.
 === "Python"
 
     Install the **working copy** into each dummy app (the editable install
-    overrides the pinned wheel) and run its gates. Do this for **both**
+    overrides the pinned wheel) and run its gates. Do this for **all three**
     frameworks — a change to shared core code must be green in each:
 
     ```bash
     # in each dummy app dir, with its own .venv active
     pip install -e '../csiapps-py[shiny]'    # dummy-python-shiny
     pip install -e '../csiapps-py[dash]'     # dummy-python-dash
+    pip install -e '../csiapps-py[streamlit]' # dummy-python-streamlit
     ```
 
     Each app's Environment panel and sandbox summary should report
@@ -159,12 +163,14 @@ copy, and once again on the **deployed** app after the change is pushed.
     .venv/bin/shiny run --reload app.py       # dummy-python-shiny  (:8000)
     .venv/bin/python app.py                   # dummy-python-dash   (:8050 or the
                                               # port in CSIAPPS_REDIRECT_URI)
+    .venv/bin/streamlit run app.py            # dummy-python-streamlit (:8501)
     ```
 
     The app calls `load_dotenv()`, so it picks up `.env`. For the live board it
     needs production mode plus the OAuth credentials — `CSIAPPS_ENV=production`,
     `CSIAPPS_CLIENT_ID`, `CSIAPPS_CLIENT_SECRET`, `CSIAPPS_REDIRECT_URI`,
-    `CSIAPPS_SCOPE`, and additionally `CSIAPPS_SECRET_KEY` for Dash. It does
+    `CSIAPPS_SCOPE`, and additionally `CSIAPPS_SECRET_KEY` for Dash and
+    Streamlit. It does
     **not** need `CSIAPPS_ACCESS_TOKEN`: once you have logged in, the access
     token comes from the web session. Set `CSIAPPS_TEST_SOURCE_UUID` as well, or
     the ingest round-trip skips itself.
@@ -310,6 +316,7 @@ deployed dummy apps at the unreleased code and redeploy them.
     ```text
     csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
     csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+    csiapps[streamlit] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
     ```
 
     Regenerate and commit the app's `manifest.json`, then push the dummy-app
@@ -317,18 +324,32 @@ deployed dummy apps at the unreleased code and redeploy them.
     the installed package's standard `direct_url.json` records the requested
     ref and resolved commit.
 
+    For the Streamlit canary, generate native Streamlit content with `app.py` as
+    the primary file:
+
+    ```bash
+    .venv/bin/rsconnect write-manifest streamlit --overwrite \
+      --entrypoint app.py .
+    ```
+
     !!! warning "Confirm the deployed package commit"
         Each app's Environment panel must show
         `csiapps: <version> (staging @ <commit>)`. Match that commit to the head
         of `csiapps-py@staging` before trusting the green boards. A version alone
         is not enough because every staging commit can carry the same version.
 
-    !!! info "Connect Cloud access setting"
-        Enable **Public Access** on each dummy app's Connect Cloud content so
-        visitors reach the app and `csiapps` can redirect them to CSI Access
-        Portal. If it is disabled, Connect shows its own Posit login before the
-        app starts; that does not validate CSI authentication. The app remains
-        protected by its Shiny or Dash authentication wrapper.
+    !!! info "Host access setting"
+        Enable **Public Access** on each canary's Connect Cloud content. This
+        lets `csiapps` redirect visitors to CSI Access Portal.
+        A host login in front of the app does not validate CSI authentication;
+        the app itself remains protected by its framework wrapper.
+
+    !!! info "Streamlit uses the native Connect Cloud content type"
+        Publish `dummy-python-streamlit` as **Streamlit** with `app.py` as the
+        primary file. Put its OAuth values in the content's secret environment
+        variables, not `st.secrets`. Its `CSIAPPS_REDIRECT_URI` is the final
+        public app URL itself—unlike Dash, it has no `/redirect` suffix—and the
+        same exact URL must be registered in CSI Access Portal.
 
 Open the deployed app and confirm: login returns "Signed in as …", both
 self-test boards are green in production, Registry shows real orgs/athletes, and
@@ -417,9 +438,9 @@ the Warehouse round-trip works.
        behaviour are hand-written and must be edited. Pushing to `main` there
        redeploys the site.
     4. **Validate the published artifact and redeploy production consumers.**
-       Install both `csiapps[shiny]==<new version>` and
-       `csiapps[dash]==<new version>` in clean temporary environments and run
-       the corresponding dummy app's sandbox self-test from each. Then update
+       Install `csiapps[shiny]==<new version>`, `csiapps[dash]==<new version>`,
+       and `csiapps[streamlit]==<new version>` in clean temporary environments
+       and run the corresponding dummy app's sandbox self-test from each. Then update
        each production app deliberately. Do **not** change the dummy apps'
        committed requirements: they stay on `staging` continuously.
 
@@ -451,7 +472,7 @@ the Warehouse round-trip works.
 === "Python"
 
     - [ ] `pytest` green in `csiapps-py`.
-    - [ ] `selftest.py` (sandbox) green in **both** dummy apps against the
+    - [ ] `selftest.py` (sandbox) green in **all three** dummy apps against the
           working copy.
     - [ ] Each dummy app renders and both boards are green locally, in
           production mode.
@@ -476,7 +497,7 @@ worth knowing before you run the loop in the other language:
 
 | | R | Python |
 |---|---|---|
-| Canaries | `dummy-r-shiny` | `dummy-python-shiny` + `dummy-python-dash` |
+| Canaries | `dummy-r-shiny` | `dummy-python-shiny` + `dummy-python-dash` + `dummy-python-streamlit` |
 | Test command | `devtools::test()` / `devtools::check()` | `uv run pytest` |
 | Regenerate docs from source | `devtools::document()` commits `man/` + `NAMESPACE` | not needed — mkdocstrings reads the source |
 | Getting the working copy into the dummy app | automatic, `pkgload::load_all("../csiapps")` | `pip install -e '../csiapps-py[extra]'` |

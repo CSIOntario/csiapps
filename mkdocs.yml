@@ -1,5 +1,5 @@
 site_name: csiapps
-site_description: Helper functions for CSI data warehouse ingestion and Shiny apps — R and Python
+site_description: Helper functions for CSI data warehouse ingestion and Shiny, Dash, and Streamlit apps
 repo_url: https://github.com/CSIOntario/csiapps
 theme:
   name: material
@@ -53,6 +53,7 @@ nav:
   - Tutorials:
       - Shiny apps: shiny-apps.md
       - Dash apps: dash-apps.md
+      - Streamlit apps: streamlit-apps.md
       - REST API: rest-api.md
       - Sandbox mode: sandbox.md
   - Migrating Python apps: migrating.md

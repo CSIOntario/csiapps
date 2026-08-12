@@ -5,6 +5,9 @@ packages — [R](https://github.com/CSIOntario/csiapps-r) and
 [Python](https://github.com/CSIOntario/csiapps-py) — built with
 [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
+It covers the shared warehouse/sandbox API and the Shiny, Dash, and Streamlit
+application wrappers available in the applicable language.
+
 **Live site: https://csiontario.github.io/csiapps/**
 
 The Python API reference (`docs/api.md`) is autodoc'd via `mkdocstrings` from

@@ -1,4 +1,4 @@
 mkdocs-material>=9.5
 mkdocstrings[python]>=0.25
 # API reference is autodoc'd from the Python package's live source on main.
-csiapps @ git+https://github.com/CSIOntario/csiapps-py.git@main
+csiapps[shiny,dash,streamlit] @ git+https://github.com/CSIOntario/csiapps-py.git@main
