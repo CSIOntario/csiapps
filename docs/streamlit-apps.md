@@ -69,8 +69,9 @@ In production the flow is:
 
 1. `page_wrapper()` validates the OAuth configuration and the app's public URL.
 2. It generates a PKCE verifier/challenge and a random browser nonce.
-3. The sign-in button stores only that nonce in a ten-minute `SameSite=Lax`
-   cookie, then sends the browser to CSI Access Portal.
+3. The page stores only that nonce in a ten-minute `SameSite=Lax` cookie and
+   immediately sends the browser to CSI Access Portal. An existing CSI session
+   continues without an extra click; otherwise CSI displays its login page.
 4. CSI redirects to the app's own public URL with `code` and encrypted `state`
    query parameters.
 5. The wrapper decrypts the AES-GCM state, checks its age, exact redirect URI,
@@ -91,6 +92,10 @@ Streamlit session state is tied to the WebSocket. A hard reload, browser
 navigation, or reopened tab can therefore require sign-in again. This is an
 intentional security trade-off: the package does not persist delegated access
 tokens in cookies or local storage.
+
+After an authentication error or an explicit logout, automatic authorization
+is paused and the page leaves a **Sign in with CSI** button for a deliberate
+retry. This prevents logout from immediately signing the visitor back in.
 
 ## Production variables
 
