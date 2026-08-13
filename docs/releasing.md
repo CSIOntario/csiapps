@@ -32,10 +32,11 @@ regression harnesses:
     - [`dummy-python-streamlit`](https://github.com/CSIOntario/dummy-python-streamlit) —
       the native Streamlit canary for Posit Connect Cloud.
 
-Together they exercise the relevant `csiapps` public surface. A **clean render
-plus two green self-test boards** (sandbox + live) is our evidence that a change is safe.
-Every release runs the dummy apps twice: once **locally** against the working
-copy, and once again on the **deployed** app after the change is pushed.
+Together they exercise the relevant `csiapps` public surface. Every release
+validates the dummy apps twice: first **locally**, where the sandbox self-test
+runs against the working copy without credentials, and then on the **deployed**
+app after the change is pushed. A clean deployed render plus two green self-test
+boards (sandbox + live) is our evidence that a change is safe.
 
 ## The loop
 
@@ -91,43 +92,12 @@ copy, and once again on the **deployed** app after the change is pushed.
         you are validating the wrong code. Set `CSIAPPS_SRC=""` deliberately
         when you *do* want to test the installed release.
 
-    There are three gates. The first is cheap and unconditional; the other two
-    are the same live suite reached two different ways.
-
-    **a) Sandbox gate** — fast, no credentials, no network. Must all PASS and
-    exit 0:
+    Run the sandbox gate. It is fast, uses no credentials or environment
+    variables, and makes no network requests. All checks must PASS and exit 0:
 
     ```bash
     Rscript selftest.R
     ```
-
-    **b) Live gate, in the app** — this is the one that normally matters. Run
-    the app, log in through the browser, and read the live self-test board:
-
-    ```bash
-    Rscript -e 'shiny::runApp(port = 8000)'
-    ```
-
-    R auto-loads `.Renviron` from the project directory at startup, so the
-    variables documented in `.Renviron.example` are picked up with no extra
-    step. For the live board you need `CSIAPPS_ENV=production` plus
-    `CSIAPPS_CLIENT_ID`, `CSIAPPS_CLIENT_SECRET`, `CSIAPPS_REDIRECT_URI`, and
-    optionally `CSIAPPS_SCOPE`. You do **not** need `CSIAPPS_ACCESS_TOKEN` —
-    once you have logged in, the token comes from the Shiny session. Set
-    `CSIAPPS_TEST_SOURCE_UUID` as well, or the ingest round-trip skips itself.
-
-    While you are there, eyeball the app: chrome renders, both boards green,
-    Registry + Warehouse tabs work.
-
-    **c) Live gate, from the CLI** — optional, no browser:
-
-    ```bash
-    Rscript selftest.R --live
-    ```
-
-    Because `.Renviron` is loaded for `Rscript` too, this needs no exported
-    shell variables — but it does need a real `CSIAPPS_ACCESS_TOKEN` in there,
-    since there is no web session to take one from.
 
 === "Python"
 
@@ -146,60 +116,16 @@ copy, and once again on the **deployed** app after the change is pushed.
     `csiapps: <version> (local editable)`. On a deployed Git install they report
     the requested ref and exact resolved commit instead.
 
-    There are three gates. The first is cheap and unconditional; the other two
-    are the same live suite reached two different ways.
-
-    **a) Sandbox gate** — fast, no credentials, no network. Must all PASS and
-    exit 0:
+    Run the sandbox gate in each app. It is fast, uses no credentials or
+    environment variables, and makes no network requests. All checks must PASS
+    and exit 0:
 
     ```bash
     .venv/bin/python selftest.py
     ```
 
-    **b) Live gate, in the app** — this is the one that normally matters. Run
-    the app, log in through the browser, and read the live self-test board:
-
-    ```bash
-    .venv/bin/shiny run --reload app.py       # dummy-python-shiny  (:8000)
-    .venv/bin/python app.py                   # dummy-python-dash   (:8050 or the
-                                              # port in CSIAPPS_REDIRECT_URI)
-    .venv/bin/streamlit run app.py            # dummy-python-streamlit (:8501)
-    ```
-
-    The app calls `load_dotenv()`, so it picks up `.env`. For the live board it
-    needs production mode plus the OAuth credentials — `CSIAPPS_ENV=production`,
-    `CSIAPPS_CLIENT_ID`, `CSIAPPS_CLIENT_SECRET`, `CSIAPPS_REDIRECT_URI`,
-    `CSIAPPS_SCOPE`, and additionally `CSIAPPS_SECRET_KEY` for Dash and
-    Streamlit. It does
-    **not** need `CSIAPPS_ACCESS_TOKEN`: once you have logged in, the access
-    token comes from the web session. Set `CSIAPPS_TEST_SOURCE_UUID` as well, or
-    the ingest round-trip skips itself.
-
-    While you are there, eyeball the app: chrome renders, both boards green,
-    Registry + Warehouse tabs work.
-
-    **c) Live gate, from the CLI** — optional, and it has a sharp edge:
-
-    ```bash
-    CSIAPPS_ENV=production CSIAPPS_ACCESS_TOKEN=<token> \
-      .venv/bin/python selftest.py --live
-    ```
-
-    `selftest.py` does **not** call `load_dotenv()` — only `app.py` does — so it
-    sees nothing but the ambient shell environment. And with no web session,
-    `current_token()` falls back to `CSIAPPS_ACCESS_TOKEN`, which is blank in
-    the checked-in `.env` files. Both values have to be exported in the shell.
-
-!!! warning "A green `--live` run can mean zero live checks ran"
-    The live suite returns early with a **SKIP** row if the app is in sandbox
-    mode, and again if no token is available. `SKIP` is not `FAIL`, and the
-    self-test exits non-zero only on failures — so a run with every live check
-    skipped still prints a tidy summary and exits 0. Always read the
-    `N passed, N failed, N skipped` line rather than trusting the exit code.
-    This applies to both languages.
-
-Run each app in **sandbox** mode (the default) at minimum; run it in
-**production** mode too if the change touches auth, the client, or chrome.
+Local validation stops here. The live suite requires real credentials and runs
+later against the deployed dummy apps in step 4.
 
 **Green everywhere ⇒ proceed. Any red ⇒ fix `csiapps` and repeat.**
 
@@ -344,13 +270,6 @@ deployed dummy apps at the unreleased code and redeploy them.
         A host login in front of the app does not validate CSI authentication;
         the app itself remains protected by its framework wrapper.
 
-    !!! info "Streamlit uses the native Connect Cloud content type"
-        Publish `dummy-python-streamlit` as **Streamlit** with `app.py` as the
-        primary file. Put its OAuth values in the content's secret environment
-        variables, not `st.secrets`. Its `CSIAPPS_REDIRECT_URI` is the final
-        public app URL itself—unlike Dash, it has no `/redirect` suffix—and the
-        same exact URL must be registered in CSI Access Portal.
-
 Open the deployed app and confirm: login returns "Signed in as …", both
 self-test boards are green in production, Registry shows real orgs/athletes, and
 the Warehouse round-trip works.
@@ -452,9 +371,6 @@ the Warehouse round-trip works.
     - [ ] `devtools::test()` and `devtools::check()` green in `csiapps-r`.
     - [ ] `Rscript selftest.R` (sandbox) green in `dummy-r-shiny` against the
           working copy — with the `pkgload::load_all` line confirmed in the log.
-    - [ ] The dummy app renders and both boards are green locally, in production
-          mode.
-    - [ ] Any `selftest.R --live` run checked for skipped rows, not just exit 0.
     - [ ] Change merged into **`staging`** on `csiapps-r` (not `main`).
     - [ ] `DESCRIPTION` version bumped **on `staging`, before** the deployed
           gate — so the validated commit is the tagged commit.
@@ -474,9 +390,6 @@ the Warehouse round-trip works.
     - [ ] `pytest` green in `csiapps-py`.
     - [ ] `selftest.py` (sandbox) green in **all three** dummy apps against the
           working copy.
-    - [ ] Each dummy app renders and both boards are green locally, in
-          production mode.
-    - [ ] Any `selftest.py --live` run checked for skipped rows, not just exit 0.
     - [ ] Change merged into **`csiapps-py@staging`**, not `main`.
     - [ ] Version bumped in both files before the deployed gate.
     - [ ] Dummy-app manifest regenerated and pushed with its applicable
