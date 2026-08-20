@@ -1,7 +1,8 @@
 # csiapps
 
 Helper functions and utilities for CSI data warehouse ingestion and
-[Shiny](https://shiny.posit.co/), Dash, and Streamlit web applications. `csiapps` ships as **two
+[Shiny](https://shiny.posit.co/), Dash, Streamlit, and authenticated interactive
+Quarto documents. `csiapps` ships as **two
 packages with full feature parity** — one for R, one for Python — so a team can
 work in either language against the same CSIAPPS warehouse and registration API.
 
@@ -21,7 +22,9 @@ The library has three layers:
   wrappers live in per-framework submodules behind optional extras:
   `csiapps.shiny` (`ui_wrapper` / `server_wrapper`, `csiapps[shiny]`) and
   `csiapps.dash` (`attach` / `layout_wrapper`, `csiapps[dash]`) and
-  `csiapps.streamlit` (`page_wrapper`, `csiapps[streamlit]`). The
+  `csiapps.streamlit` (`page_wrapper`, `csiapps[streamlit]`). Quarto uses the
+  language-neutral `csiapps-quarto` extension plus `quarto_setup()` in R or
+  `csiapps.quarto.quarto_setup()` in Python. The
   API client and sandbox above depend on no web framework; see
   [Migrating Python apps](migrating.md).
 
@@ -41,6 +44,7 @@ The library has three layers:
     pip install 'csiapps[shiny]'   # add the Shiny app wrappers
     pip install 'csiapps[dash]'    # add the Dash app wrappers
     pip install 'csiapps[streamlit]' # add the Streamlit app wrappers
+    pip install 'csiapps[quarto]'    # add the Quarto Shiny adapter
     ```
 
     The web frameworks are independent optional extras; `import csiapps` pulls
@@ -82,6 +86,8 @@ never hit the production warehouse by accident:
   `attach` / `layout_wrapper`.
 - **[Streamlit apps](streamlit-apps.md)** — secure OAuth2 PKCE through a native
   Streamlit entrypoint using `page_wrapper`.
+- **[Quarto documents](quarto-docs.md)** — publish a CSI-authenticated report to
+  Connect Cloud and optionally download a complete interactive HTML snapshot.
 - **[Migrating Python apps](migrating.md)** — upgrade a pre-0.3 Python app to the
   new `csiapps[shiny]` extra and `csiapps.shiny` imports.
 - **[REST API](rest-api.md)** — `make_request` and the registration helpers.

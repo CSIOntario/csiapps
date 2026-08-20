@@ -22,6 +22,8 @@ regression harnesses:
 
     - [`dummy-r-shiny`](https://github.com/CSIOntario/dummy-r-shiny) — the Shiny
       canary, and the only one R needs (there is no R Dash package).
+    - `dummy-r-quarto` — the authenticated Quarto document and offline-snapshot
+      canary.
 
 === "Python"
 
@@ -31,12 +33,21 @@ regression harnesses:
       the Dash canary.
     - [`dummy-python-streamlit`](https://github.com/CSIOntario/dummy-python-streamlit) —
       the native Streamlit canary for Posit Connect Cloud.
+    - `dummy-python-quarto` — the Python Quarto document and offline-snapshot
+      canary.
 
 Together they exercise the relevant `csiapps` public surface. Every release
 validates the dummy apps twice: first **locally**, where the sandbox self-test
 runs against the working copy without credentials, and then on the **deployed**
 app after the change is pushed. A clean deployed render plus two green self-test
 boards (sandbox + live) is our evidence that a change is safe.
+
+For a Quarto change, deploy both `dummy-r-quarto` and
+`dummy-python-quarto` to **Connect Cloud** from `staging`. Connect Cloud is the
+primary release gate: verify the anonymous login shell, two-viewer isolation,
+snapshot completeness, and fully offline reopening there. Then run a secondary
+smoke deployment on self-hosted Posit Connect. Only the exact commit that passes
+both checks may advance from `staging` to `main` and receive a version tag.
 
 ## The loop
 

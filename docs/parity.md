@@ -48,6 +48,19 @@ both — with two exceptions that are intentional and explained under
 | Reactive login guard | `token_ready()` | `token_ready()` |
 | Make globals visible to the server | `global_wrapper()` |  |
 
+## Quarto documents
+
+Both languages use the same `csiapps-quarto` extension, YAML, fenced-div
+components, and browser snapshot runtime.
+
+| Capability | R | Python |
+|---|---|---|
+| Attach CSI auth and register snapshot data | `quarto_setup()` | `csiapps.quarto.quarto_setup()` |
+| Install runtime dependency | Included with the R package | `csiapps[quarto]` |
+| Accepted tabular data | Named data frames / record lists | Mapping of Pandas data frames / record lists |
+| Per-viewer session token | Existing Shiny session token | Existing Shiny session token |
+| Offline interactive snapshot | Language-neutral extension runtime | Language-neutral extension runtime |
+
 ## Dash app wrappers (Python only)
 
 Dash is a Python framework with no R counterpart, so these have no R column. See
