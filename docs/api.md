@@ -20,6 +20,7 @@ how the two map onto each other, see the [parity checklist](parity.md).
 ## Client
 
 ::: csiapps.client.make_request
+::: csiapps.client.fetch_ams_mapping
 ::: csiapps.client.fetch_org_options
 ::: csiapps.client.fetch_profiles
 ::: csiapps.client.fetch_profile

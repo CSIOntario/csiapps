@@ -523,14 +523,16 @@ maintains an **AMS_mapping** data source whose records link each CSIAPPS athlete
 `vendor_profile_name`). A consumer app reads AMS_mapping to translate the
 vendor's own ids into canonical CSIAPPS athlete ids.
 
-In production the mapping already lives in the warehouse. To build and test the
-consumer **locally**, you reproduce a miniature AMS_mapping source in the
-sandbox, then read it back and join — exactly as production will.
+In production the warehouse stores append-only mapping history and response
+metadata. Consumer apps need only the current four-column mapping, so
+`fetch_ams_mapping()` hides that difference: in the sandbox it returns the
+simple current mapping you ingest; in production it flattens the full response,
+keeps the latest record per mapping identity, and removes inactive mappings.
 
 !!! note
-    Steps 1–3 below (dummy athletes, schema, ingestion) are **development-only
+    Steps 1–2 below (dummy athletes, schema, ingestion) are **development-only
     scaffolding**. In production the AMS_mapping source is already populated
-    upstream; only the read-and-join in step 4 is real app code, and it ships
+    upstream; only the read-and-join in step 3 is real app code, and it ships
     **unchanged**. Give each source its own descriptively-named environment
     variable (here `AMS_MAPPING_UUID`) rather than a generic `SOURCE_UUID`.
 
@@ -567,27 +569,39 @@ those come from `create_profile()`, which assigns ids in insertion order.
     [p["id"] for p in athletes]   # e.g. [1, 2, 3]
     ```
 
-### 2. Register the AMS_mapping schema and ingest the mapping
+### 2. Register a simple AMS_mapping schema and ingest the current mapping
 
 The mapping bridges two id systems: `id` is the CSIAPPS athlete id (matching the
 dummy profiles above), and `vendor_profile_id` is the athlete's id in **your**
-vendor system — a real value from your data. Keep every base mapping
-`active = true`, and ingest with `subject_field = "id"` so each mapping links to
-its CSIAPPS athlete. `register_sandbox_schema()` also accepts a path to a
-`.schema.json` file.
+vendor system — a real value from your data. The sandbox schema intentionally
+contains only the four columns consumer apps use; it does not reproduce the
+production warehouse's `active` history or response metadata. Ingest with
+`subject_field = "id"` so each row links to its dummy CSIAPPS athlete.
 
 === "R"
 
     ```r
-    register_sandbox_schema(Sys.getenv("AMS_MAPPING_UUID"), "mapping.schema.json")
+    mapping_schema <- list(
+      type = "object",
+      additionalProperties = FALSE,
+      required = as.list(c("id", "vendor", "vendor_profile_id",
+                           "vendor_profile_name")),
+      properties = list(
+        id                  = list(type = "number"),
+        vendor              = list(type = "string"),
+        vendor_profile_id   = list(type = "string"),
+        vendor_profile_name = list(type = "string")
+      )
+    )
+    register_sandbox_schema(Sys.getenv("AMS_MAPPING_UUID"), mapping_schema)
 
     mapping <- list(
       list(id = 1, vendor = "VendorX", vendor_profile_id = "VX-8841",
-           vendor_profile_name = "Ada N.",   active = TRUE),
+           vendor_profile_name = "Ada N."),
       list(id = 2, vendor = "VendorX", vendor_profile_id = "VX-8842",
-           vendor_profile_name = "Blair O.", active = TRUE),
+           vendor_profile_name = "Blair O."),
       list(id = 3, vendor = "VendorX", vendor_profile_id = "VX-9001",
-           vendor_profile_name = "Cai Z.",   active = TRUE)
+           vendor_profile_name = "Cai Z.")
     )
 
     make_request(
@@ -601,15 +615,26 @@ its CSIAPPS athlete. `register_sandbox_schema()` also accepts a path to a
 === "Python"
 
     ```python
-    csiapps.register_sandbox_schema(os.environ["AMS_MAPPING_UUID"], "mapping.schema.json")
+    mapping_schema = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["id", "vendor", "vendor_profile_id", "vendor_profile_name"],
+        "properties": {
+            "id": {"type": "number"},
+            "vendor": {"type": "string"},
+            "vendor_profile_id": {"type": "string"},
+            "vendor_profile_name": {"type": "string"},
+        },
+    }
+    csiapps.register_sandbox_schema(os.environ["AMS_MAPPING_UUID"], mapping_schema)
 
     mapping = [
         {"id": 1, "vendor": "VendorX", "vendor_profile_id": "VX-8841",
-         "vendor_profile_name": "Ada N.",   "active": True},
+         "vendor_profile_name": "Ada N."},
         {"id": 2, "vendor": "VendorX", "vendor_profile_id": "VX-8842",
-         "vendor_profile_name": "Blair O.", "active": True},
+         "vendor_profile_name": "Blair O."},
         {"id": 3, "vendor": "VendorX", "vendor_profile_id": "VX-9001",
-         "vendor_profile_name": "Cai Z.",   "active": True},
+         "vendor_profile_name": "Cai Z."},
     ]
 
     csiapps.make_request(
@@ -624,29 +649,18 @@ Keep `vendor_profile_id` a **string** (vendor id formats vary). If you are
 loading the mapping from a CSV, read that column as text before building the
 records.
 
-### 3. Read the mapping back and join your vendor data
+### 3. Fetch the current mapping and join your vendor data
 
-This is the only part that ships to production. Pull the AMS_mapping records,
-keep the active ones, and join your real vendor data onto them by
-`vendor_profile_id` — every vendor measurement now carries a canonical CSIAPPS
-`id`, which you can enrich with `fetch_profile()`.
+This is the only part that ships to production. `fetch_ams_mapping()` returns
+the same four columns in both modes, ready to join to real vendor data by
+`vendor_profile_id`. Every matched measurement then carries a canonical
+CSIAPPS `id`, which you can enrich with `fetch_profile()`.
 
 === "R"
 
     ```r
-    resp <- make_request(
-      endpoint = "api/warehouse/data-records",
-      query    = list(source_uuid = Sys.getenv("AMS_MAPPING_UUID")),
-      paginate = TRUE
-    )
-
-    mapping <- do.call(rbind, lapply(resp[[1]]$results, function(r) data.frame(
-      id                = r$data$id,
-      vendor_profile_id = r$data$vendor_profile_id,
-      active            = r$data$active,
-      stringsAsFactors  = FALSE
-    )))
-    mapping <- mapping[mapping$active, ]
+    mapping <- fetch_ams_mapping()
+    mapping <- mapping[mapping$vendor == "VendorX", ]
 
     # your REAL third-party data, keyed by the vendor's own id
     vendor_data <- data.frame(
@@ -668,19 +682,8 @@ keep the active ones, and join your real vendor data onto them by
     ```python
     import pandas as pd
 
-    resp = csiapps.make_request(
-        "api/warehouse/data-records",
-        query={"source_uuid": os.environ["AMS_MAPPING_UUID"]},
-        paginate=True,
-    )
-
-    mapping = pd.DataFrame(
-        {"id": r["data"]["id"],
-         "vendor_profile_id": r["data"]["vendor_profile_id"],
-         "active": r["data"]["active"]}
-        for r in resp[0]["results"]
-    )
-    mapping = mapping[mapping["active"]]
+    mapping = csiapps.fetch_ams_mapping()
+    mapping = mapping[mapping["vendor"] == "VendorX"]
 
     # your REAL third-party data, keyed by the vendor's own id
     vendor_data = pd.DataFrame({
@@ -697,22 +700,22 @@ keep the active ones, and join your real vendor data onto them by
     joined
     ```
 
-!!! note "The `active` flag and append-only history"
-    AMS_mapping is append-only: a mapping is corrected or removed by appending a
-    new record (a tombstone with `active = false`, plus any corrected record),
-    and the most recent record per identity wins. In **production** the warehouse
-    returns only currently-active mappings (filtered server-side). The
-    **sandbox returns every record you ingest**, unfiltered — so if you ingest
-    corrections while testing, reduce to the latest record per identity and keep
-    the active ones yourself to mirror what production returns.
+!!! note "How production history becomes the current mapping"
+    AMS_mapping is append-only in production: corrections and deletions append
+    new records rather than changing old ones. `fetch_ams_mapping()` follows
+    pagination up to `max_pages`, selects the latest record for each
+    `(id, vendor, vendor_profile_id, vendor_profile_name)` identity using
+    `updated_at` and the warehouse record id, treats a missing legacy `active`
+    value as active, and drops identities whose latest record is inactive. The
+    sandbox skips this reduction because its four-column data already represents
+    the current mapping.
 
 ### Going to production
 
 Disable sandbox mode and let CSIAPPS set `AMS_MAPPING_UUID` to the real source
 uuid. Steps 1–2 fall away entirely — the real AMS_mapping source is already
-populated upstream — and the step 3 read-and-join runs **unchanged**, now
-returning server-filtered active mappings whose subjects resolve against real
-registrations.
+populated upstream — and the step 3 read-and-join runs **unchanged**. The helper
+now reduces the production response to the same four-column shape used locally.
 
 ## Limitations
 

@@ -23,6 +23,7 @@ both — with two exceptions that are intentional and explained under
 | Capability | R | Python |
 |---|---|---|
 | Authenticated request to any endpoint | `make_request()` | `make_request()` |
+| Fetch the current four-column AMS mapping | `fetch_ams_mapping()` | `fetch_ams_mapping()` |
 | Fetch organisation options | `fetch_org_options()` | `fetch_org_options()` |
 | Fetch profiles (auto-paginating) | `fetch_profiles()` | `fetch_profiles()` |
 | Fetch a single profile by id | `fetch_profile()` | `fetch_profile()` |
