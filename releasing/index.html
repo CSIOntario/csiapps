@@ -1,0 +1,1497 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Helper functions for CSI data warehouse ingestion and Shiny, Dash, and Streamlit apps">
+      
+      
+      
+      
+        <link rel="prev" href="../parity/">
+      
+      
+        <link rel="next" href="../api/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>Releasing csiapps - csiapps</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#releasing-csiapps" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="csiapps" class="md-header__button md-logo" aria-label="csiapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            csiapps
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Releasing csiapps
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="red" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="red" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/CSIOntario/csiapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="csiapps" class="md-nav__button md-logo" aria-label="csiapps" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    csiapps
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/CSIOntario/csiapps" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorials
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../shiny-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Shiny apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dash-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dash apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../streamlit-apps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Streamlit apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../rest-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    REST API
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sandbox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sandbox mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../migrating/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migrating Python apps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../parity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Parity checklist
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releasing csiapps
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releasing csiapps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-canary-principle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The canary principle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-make-the-change-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Make the change locally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-validate-against-the-dummy-apps-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Validate against the dummy apps locally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-push-the-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Push the change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-re-validate-on-the-deployed-dummy-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Re-validate on the deployed dummy apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-make-it-official" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Make it official
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-two-release-processes-differ" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the two release processes differ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="https://csiontario.github.io/csiapps-r/reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    R reference ↗
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-canary-principle" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The canary principle
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="The loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-make-the-change-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Make the change locally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-validate-against-the-dummy-apps-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Validate against the dummy apps locally
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-push-the-change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Push the change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-re-validate-on-the-deployed-dummy-apps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Re-validate on the deployed dummy apps
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-make-it-official" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Make it official
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checklist" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checklist
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-the-two-release-processes-differ" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How the two release processes differ
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="releasing-csiapps">Releasing <code>csiapps</code></h1>
+<p>How to ship a change to <code>csiapps</code> safely — the canary→publish loop, from a local
+edit to a published release with every dependent app redeployed.</p>
+<p><code>csiapps</code> is two packages, and both follow the same five-step loop. Pick your
+language with the tabs; the choice sticks across the whole page.</p>
+<div class="admonition info">
+<p class="admonition-title">This page is for maintainers of the <code>csiapps</code> packages</p>
+<p>If you are <em>using</em> <code>csiapps</code> to build an app, you want the tutorials
+instead: <a href="../shiny-apps/">Shiny apps</a>, <a href="../dash-apps/">Dash apps</a>,
+<a href="../streamlit-apps/">Streamlit apps</a>, <a href="../sandbox/">Sandbox mode</a>, and the
+<a href="../rest-api/">REST API</a>.</p>
+</div>
+<h2 id="the-canary-principle">The canary principle</h2>
+<p>Production apps depend on <code>csiapps</code>, so an unforeseen change can silently break
+them. We don't rely on catching that by eye — we use the <strong>dummy apps</strong> as
+regression harnesses:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">R</label><label for="__tabbed_1_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul>
+<li><a href="https://github.com/CSIOntario/dummy-r-shiny"><code>dummy-r-shiny</code></a> — the Shiny
+  canary, and the only one R needs (there is no R Dash package).</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<ul>
+<li><a href="https://github.com/CSIOntario/dummy-python-shiny"><code>dummy-python-shiny</code></a> —
+  the Shiny canary.</li>
+<li><a href="https://github.com/CSIOntario/dummy-python-dash"><code>dummy-python-dash</code></a> —
+  the Dash canary.</li>
+<li><a href="https://github.com/CSIOntario/dummy-python-streamlit"><code>dummy-python-streamlit</code></a> —
+  the native Streamlit canary for Posit Connect Cloud.</li>
+</ul>
+</div>
+</div>
+</div>
+<p>Together they exercise the relevant <code>csiapps</code> public surface. Every release
+validates the dummy apps twice: first <strong>locally</strong>, where the sandbox self-test
+runs against the working copy without credentials, and then on the <strong>deployed</strong>
+app after the change is pushed. A clean deployed render plus two green self-test
+boards (sandbox + live) is our evidence that a change is safe.</p>
+<h2 id="the-loop">The loop</h2>
+<h3 id="1-make-the-change-locally">1. Make the change locally</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">R</label><label for="__tabbed_2_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Edit <code>csiapps-r</code> and run its own gates. <code>document()</code> first — <code>man/</code> and
+<code>NAMESPACE</code> are committed to the repo, so a roxygen change that isn't
+regenerated ships stale docs:</p>
+<div class="highlight"><pre><span></span><code><span class="n">devtools</span><span class="o">::</span><span class="nf">document</span><span class="p">()</span><span class="w">   </span><span class="c1"># regenerate man/ + NAMESPACE</span>
+<span class="n">devtools</span><span class="o">::</span><span class="nf">test</span><span class="p">()</span><span class="w">       </span><span class="c1"># testthat</span>
+<span class="n">devtools</span><span class="o">::</span><span class="nf">check</span><span class="p">()</span><span class="w">      </span><span class="c1"># full R CMD check</span>
+</code></pre></div>
+<p><code>devtools::test()</code> is the fast inner loop; <code>check()</code> is slower but catches
+the documentation, <code>NAMESPACE</code>, and example problems <code>test()</code> won't. Run
+<code>check()</code> at least once before you tag in step 5. The same gates run in CI
+on every push via <code>.github/workflows/R-CMD-check.yaml</code>.</p>
+</div>
+<div class="tabbed-block">
+<p>Edit <code>csiapps-py</code> and run its own gates:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest
+uv<span class="w"> </span>run<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.
+uv<span class="w"> </span>build
+uvx<span class="w"> </span>twine<span class="w"> </span>check<span class="w"> </span>--strict<span class="w"> </span>dist/*
+</code></pre></div>
+<p>Framework test groups skip themselves when their extra is absent; run the
+full Shiny, Dash, and Streamlit matrix if you touched shared code.</p>
+</div>
+</div>
+</div>
+<h3 id="2-validate-against-the-dummy-apps-locally">2. Validate against the dummy apps locally</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">R</label><label for="__tabbed_3_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><strong>There is nothing to install.</strong> The dummy app's
+<a href="https://github.com/CSIOntario/dummy-r-shiny/blob/main/csiapps_dev.R"><code>csiapps_dev.R</code></a>
+calls <code>pkgload::load_all("../csiapps")</code>, so it picks up the sibling source
+checkout on every run — edit the package, run the app, see the result. Just
+make sure the two repos are siblings on disk (or point <code>CSIAPPS_SRC</code> at the
+source).</p>
+<div class="admonition tip">
+<p class="admonition-title">Confirm which copy you are testing</p>
+<p>The app's Environment panel and the <code>selftest.R</code> summary both name the
+loaded copy — e.g., <code>csiapps: 0.1.6 (local source: ../csiapps)</code> in dev, or
+<code>csiapps: 0.1.6 (staging @ 22f36ef)</code> when it fell back to the installed
+package. If you see a ref and commit where you expected local source,
+you are validating the wrong code. Set <code>CSIAPPS_SRC=""</code> deliberately
+when you <em>do</em> want to test the installed release.</p>
+</div>
+<p>Run the sandbox gate. It is fast, uses no credentials or environment
+variables, and makes no network requests. All checks must PASS and exit 0:</p>
+<div class="highlight"><pre><span></span><code>Rscript<span class="w"> </span>selftest.R
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>Install the <strong>working copy</strong> into each dummy app (the editable install
+overrides the pinned wheel) and run its gates. Do this for <strong>all three</strong>
+frameworks — a change to shared core code must be green in each:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># in each dummy app dir, with its own .venv active</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">'../csiapps-py[shiny]'</span><span class="w">    </span><span class="c1"># dummy-python-shiny</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">'../csiapps-py[dash]'</span><span class="w">     </span><span class="c1"># dummy-python-dash</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s1">'../csiapps-py[streamlit]'</span><span class="w"> </span><span class="c1"># dummy-python-streamlit</span>
+</code></pre></div>
+<p>Each app's Environment panel and sandbox summary should report
+<code>csiapps: &lt;version&gt; (local editable)</code>. On a deployed Git install they report
+the requested ref and exact resolved commit instead.</p>
+<p>Run the sandbox gate in each app. It is fast, uses no credentials or
+environment variables, and makes no network requests. All checks must PASS
+and exit 0:</p>
+<div class="highlight"><pre><span></span><code>.venv/bin/python<span class="w"> </span>selftest.py
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Local validation stops here. The live suite requires real credentials and runs
+later against the deployed dummy apps in step 4.</p>
+<p><strong>Green everywhere ⇒ proceed. Any red ⇒ fix <code>csiapps</code> and repeat.</strong></p>
+<h3 id="3-push-the-change">3. Push the change</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">R</label><label for="__tabbed_4_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Push the branch, then merge it into <strong><code>staging</code></strong> — the integration ref,
+and what the deployed dummy app validates:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>fix/my-change
+<span class="c1"># open a PR against staging, review, merge</span>
+</code></pre></div>
+<p>Bump the version in <code>DESCRIPTION</code> on <code>staging</code> <strong>now</strong>, before step 4, not
+at release time. Then the commit the deployed dummy app validates is byte
+for byte the commit you tag in step 5, with no code moving in between.</p>
+<div class="admonition danger">
+<p class="admonition-title">In R, a git ref <em>is</em> the distribution channel</p>
+<p>There is no PyPI equivalent for <code>csiapps-r</code>. A bare
+<code>remotes::install_github("CSIOntario/csiapps-r")</code> resolves to <code>main</code>, so
+pushing there changes what everybody gets on their next reinstall,
+before you have validated anything deployed — and
+<code>.github/workflows/pkgdown.yaml</code> republishes the
+<a href="https://csiontario.github.io/csiapps-r/">reference site</a> from <code>main</code>,
+documenting API that is not released yet. Merging to <code>main</code> is step 5.</p>
+<p>This does <strong>not</strong> reach already-deployed apps: their <code>manifest.json</code>
+pins a commit, so they stay put until someone regenerates it. The
+exposure is everyone's <em>next</em> install or deploy, plus the docs.</p>
+</div>
+<p>See
+<a href="https://github.com/CSIOntario/csiapps-r/blob/main/CONTRIBUTING.md#branches-which-ref-serves-whom">which ref serves whom</a>
+for the full table.</p>
+</div>
+<div class="tabbed-block">
+<p>Push the branch, then merge it into <strong><code>staging</code></strong>, which is the integration
+ref consumed by the deployed dummy apps:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>push<span class="w"> </span>-u<span class="w"> </span>origin<span class="w"> </span>fix/my-change
+<span class="c1"># open a PR against staging, review, merge</span>
+</code></pre></div>
+<p>Bump <code>pyproject.toml</code> and <code>src/csiapps/__init__.py</code> on <code>staging</code> before the
+deployed gate. The exact commit that passes step 4 must be the commit later
+fast-forwarded to <code>main</code>, tagged, and published to PyPI.</p>
+<p>Production apps remain pinned to published PyPI versions, so merging an
+unreleased change to <code>staging</code> cannot move them. Keeping <code>main</code>
+release-aligned also prevents the Python API reference from documenting
+unreleased code, because this site installs <code>csiapps-py@main</code> when it builds.</p>
+</div>
+</div>
+</div>
+<h3 id="4-re-validate-on-the-deployed-dummy-apps">4. Re-validate on the <em>deployed</em> dummy apps</h3>
+<p>The point of this step is to catch what a local working copy can't: real OAuth,
+real data, the deployment environment, multi-request behaviour. Point the
+deployed dummy apps at the unreleased code and redeploy them.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">R</label><label for="__tabbed_5_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>The deployed app does <em>not</em> use <code>../csiapps</code>. It is published by <strong>Posit
+Connect Cloud</strong>, which is git-backed: it reads <code>manifest.json</code> from the app
+repo and installs the exact <code>csiapps</code> commit pinned there as <code>GithubSHA1</code>.
+<strong>Committing and pushing that manifest is the deployment</strong> — there is no
+rsconnect push step.</p>
+<p><a href="https://github.com/CSIOntario/dummy-r-shiny/blob/main/deploy.R"><code>deploy.R</code></a>
+installs <code>csiapps</code> from a git ref, verifies the install really is that
+commit, and regenerates the manifest. It defaults to <code>staging</code>:</p>
+<div class="highlight"><pre><span></span><code>Rscript<span class="w"> </span>deploy.R
+git<span class="w"> </span>add<span class="w"> </span>manifest.json<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Pin csiapps to staging"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
+</code></pre></div>
+<p>Connect Cloud republishes automatically on push to the tracked branch. The
+pinned commit is visible in the diff as <code>GithubSHA1</code>, so a code review can
+confirm exactly what was deployed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Confirm the deployed app is actually running your commit</p>
+<p>The build happens server-side, so nothing in your terminal proves it
+picked up the pin — and every commit on a branch reports the same
+<code>Version</code>. The app's <strong>Environment panel prints the ref and commit</strong>
+(e.g., <code>csiapps: 0.1.6 (staging @ 22f36ef)</code>); check it matches before you
+trust anything else on the page. <code>Rscript selftest.R</code> prints the same
+line. On Connect Cloud, the app reads this provenance from
+<code>manifest.json</code> when the installed package metadata omits it.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Nothing to edit by hand</p>
+<p>You never hand-edit a dependency file. The manifest is generated, so
+step 5 simply regenerates it from the release tag instead of <code>staging</code>.</p>
+</div>
+<p>Regenerate the manifest whenever <strong>any</strong> app file changes, not just when
+<code>csiapps</code> moves — it records a checksum per file.</p>
+<div class="admonition info">
+<p class="admonition-title">Deployment settings are configured once, on the content</p>
+<p>The seven environment variables from <code>.Renviron.example</code> live in the
+Connect Cloud content's <strong>Variables</strong> panel — nothing carries over from
+a local <code>.Renviron</code>, which is gitignored and not in the repo.
+<code>CSIAPPS_REDIRECT_URI</code> must be the <em>deployed</em> URL and registered as an
+OAuth redirect in CSIAPPS. If login fails on the deployed app but works
+locally, suspect these before suspecting your change.</p>
+</div>
+</div>
+<div class="tabbed-block">
+<p>Keep each applicable dummy app permanently on <strong><code>staging</code></strong>. The canary
+must never follow <code>main</code> or a PyPI version: <code>staging</code> is where new changes
+are exercised before they reach either. Each canary's <code>requirements.txt</code>
+uses its framework extra:</p>
+<div class="highlight"><pre><span></span><code>csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+csiapps[streamlit] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+</code></pre></div>
+<p>Regenerate and commit the app's <code>manifest.json</code>, then push the dummy-app
+branch tracked by Posit Connect. The manifest records app-file checksums;
+the installed package's standard <code>direct_url.json</code> records the requested
+ref and resolved commit.</p>
+<p>For the Streamlit canary, generate native Streamlit content with <code>app.py</code> as
+the primary file:</p>
+<div class="highlight"><pre><span></span><code>.venv/bin/rsconnect<span class="w"> </span>write-manifest<span class="w"> </span>streamlit<span class="w"> </span>--overwrite<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--entrypoint<span class="w"> </span>app.py<span class="w"> </span>.
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Confirm the deployed package commit</p>
+<p>Each app's Environment panel must show
+<code>csiapps: &lt;version&gt; (staging @ &lt;commit&gt;)</code>. Match that commit to the head
+of <code>csiapps-py@staging</code> before trusting the green boards. A version alone
+is not enough because every staging commit can carry the same version.</p>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Host access setting</p>
+<p>Enable <strong>Public Access</strong> on each canary's Connect Cloud content. This
+lets <code>csiapps</code> redirect visitors to CSI Access Portal.
+A host login in front of the app does not validate CSI authentication;
+the app itself remains protected by its framework wrapper.</p>
+</div>
+</div>
+</div>
+</div>
+<p>Open the deployed app and confirm: login returns "Signed in as …", both
+self-test boards are green in production, Registry shows real orgs/athletes, and
+the Warehouse round-trip works.</p>
+<p><strong>Green on the deployed dummy apps ⇒ the change is safe to make official.</strong></p>
+<h3 id="5-make-it-official">5. Make it official</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">R</label><label for="__tabbed_6_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ol>
+<li>
+<p><strong>Fast-forward <code>staging</code> into <code>main</code>.</strong> <em>This is publication.</em> From this
+   moment <code>remotes::install_github("CSIOntario/csiapps-r")</code> serves the new
+   code, and <code>.github/workflows/pkgdown.yaml</code> rebuilds the R reference site.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>checkout<span class="w"> </span>main<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>merge<span class="w"> </span>--ff-only<span class="w"> </span>staging<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
+</code></pre></div>
+<p><code>--ff-only</code> is not a style preference. A merge commit would put the tag
+on a commit that never went through step 4; a fast-forward means the
+commit you validated on the deployed app is the commit you tag. If it
+refuses, <code>main</code> has moved — rebase <code>staging</code> onto it and re-run step 4,
+because the combination is then untested.</p>
+<p>The version was already bumped in step 3, so nothing changes here.</p>
+</li>
+<li>
+<p><strong>Tag and cut a GitHub Release</strong> so consumers have a stable ref to pin.
+   The release body is where the notes for this version live — write them
+   there, since the package carries no changelog file:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>tag<span class="w"> </span>-a<span class="w"> </span>v&lt;new<span class="w"> </span>version&gt;<span class="w"> </span>-m<span class="w"> </span><span class="s2">"csiapps &lt;new version&gt;"</span>
+git<span class="w"> </span>push<span class="w"> </span>--tags
+gh<span class="w"> </span>release<span class="w"> </span>create<span class="w"> </span>v&lt;new<span class="w"> </span>version&gt;<span class="w"> </span>--generate-notes
+</code></pre></div>
+<p><code>--generate-notes</code> seeds the body from the merged commits; edit it to
+call out anything that changes behaviour for app authors.</p>
+</li>
+<li>
+<p><strong>Update the docs</strong> —
+   <a href="https://github.com/CSIOntario/csiapps"><code>csiapps</code></a>, the repo behind this
+   site. The <a href="https://csiontario.github.io/csiapps-r/reference/">R reference</a>
+   is pkgdown and rebuilds itself from <code>main</code>, but the tutorials on this
+   site, the <a href="../parity/">parity checklist</a>, and any changed behaviour are
+   hand-written and must be edited. Pushing to <code>main</code> there redeploys this
+   site.</p>
+</li>
+<li>
+<p><strong>Re-pin and redeploy consumers.</strong> Regenerate each app's manifest from
+   the release tag rather than <code>staging</code>:</p>
+<div class="highlight"><pre><span></span><code>Rscript<span class="w"> </span>deploy.R<span class="w"> </span>--ref<span class="o">=</span>v&lt;new<span class="w"> </span>version&gt;
+git<span class="w"> </span>add<span class="w"> </span>manifest.json<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Pin csiapps to v&lt;new version&gt;"</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
+</code></pre></div>
+<p>Do the same in every dependent R app — production apps pin <strong>tags</strong>,
+never <code>staging</code> or <code>main</code>. The dummy app should be green one more time
+on the pinned tag, with its Environment panel showing the tag.</p>
+</li>
+</ol>
+</div>
+<div class="tabbed-block">
+<ol>
+<li>
+<p><strong>Fast-forward <code>staging</code> into <code>main</code>.</strong> If this fails, <code>main</code> moved and
+   the combined commit has not passed the deployed gate; reconcile the
+   branches and repeat step 4.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>checkout<span class="w"> </span>main<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>merge<span class="w"> </span>--ff-only<span class="w"> </span>staging<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push
+</code></pre></div>
+</li>
+</ol>
+<p>The version was already bumped in step 3, so no source file changes here.</p>
+<ol>
+<li>
+<p><strong>Publish the validated commit to PyPI.</strong> There is no release workflow in
+   the repo yet, so this remains a manual tag, build, validation, and upload.</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>tag<span class="w"> </span>v&lt;new<span class="w"> </span>version&gt;<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>git<span class="w"> </span>push<span class="w"> </span>--tags
+uv<span class="w"> </span>build
+uvx<span class="w"> </span>twine<span class="w"> </span>check<span class="w"> </span>--strict<span class="w"> </span>dist/*
+uv<span class="w"> </span>publish
+</code></pre></div>
+</li>
+<li>
+<p><strong>Update the docs</strong> —
+   <a href="https://github.com/CSIOntario/csiapps"><code>csiapps</code></a>, the repo behind this
+   site: the <a href="../api/">Python reference</a> autodocs from <code>csiapps-py@main</code>, but
+   the tutorials, the <a href="../parity/">parity checklist</a>, and any changed
+   behaviour are hand-written and must be edited. Pushing to <code>main</code> there
+   redeploys the site.</p>
+</li>
+<li><strong>Validate the published artifact and redeploy production consumers.</strong>
+   Install <code>csiapps[shiny]==&lt;new version&gt;</code>, <code>csiapps[dash]==&lt;new version&gt;</code>,
+   and <code>csiapps[streamlit]==&lt;new version&gt;</code> in clean temporary environments
+   and run the corresponding dummy app's sandbox self-test from each. Then update
+   each production app deliberately. Do <strong>not</strong> change the dummy apps'
+   committed requirements: they stay on <code>staging</code> continuously.</li>
+</ol>
+</div>
+</div>
+</div>
+<h2 id="checklist">Checklist</h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">R</label><label for="__tabbed_7_2">Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>devtools::document()</code> run; <code>man/</code> and <code>NAMESPACE</code> changes committed.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>devtools::test()</code> and <code>devtools::check()</code> green in <code>csiapps-r</code>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>Rscript selftest.R</code> (sandbox) green in <code>dummy-r-shiny</code> against the
+      working copy — with the <code>pkgload::load_all</code> line confirmed in the log.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Change merged into <strong><code>staging</code></strong> on <code>csiapps-r</code> (not <code>main</code>).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>DESCRIPTION</code> version bumped <strong>on <code>staging</code>, before</strong> the deployed
+      gate — so the validated commit is the tagged commit.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>Rscript deploy.R</code> run in <code>dummy-r-shiny</code>; regenerated
+      <code>manifest.json</code> committed and pushed.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deployed dummy app green in production, <strong>and its Environment panel
+      shows the commit that was just pinned</strong>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>staging</code> fast-forwarded into <code>main</code> (<code>--ff-only</code>); tag pushed and
+      GitHub Release created, with notes covering anything that changes
+      behaviour for app authors.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Docs updated (tutorials / parity / behaviour notes).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>deploy.R --ref=v&lt;version&gt;</code> re-run in the dummy app and every
+      dependent R app; manifests committed and pushed.</li>
+</ul>
+</div>
+<div class="tabbed-block">
+<ul class="task-list">
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>pytest</code> green in <code>csiapps-py</code>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>selftest.py</code> (sandbox) green in <strong>all three</strong> dummy apps against the
+      working copy.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Change merged into <strong><code>csiapps-py@staging</code></strong>, not <code>main</code>.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Version bumped in both files before the deployed gate.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Dummy-app manifest regenerated and pushed with its applicable
+      <code>csiapps[...] @ git+...@staging</code> requirement.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Deployed dummy apps green in production and showing the exact staging
+      commit in their Environment panel.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> <code>staging</code> fast-forwarded into <code>main</code>; validated commit tagged, built,
+      checked, and published to PyPI.</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Docs updated (tutorials / parity / behaviour notes).</li>
+<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled/><span class="task-list-indicator"></span></label> Published <code>csiapps==&lt;version&gt;</code> artifact validated in a clean
+      environment and the pin bumped in every production app; dummy apps
+      remain on <code>git+...@staging</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+<h2 id="how-the-two-release-processes-differ">How the two release processes differ</h2>
+<p>Everything above follows the same five steps, but the mechanics diverge in ways
+worth knowing before you run the loop in the other language:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>R</th>
+<th>Python</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Canaries</td>
+<td><code>dummy-r-shiny</code></td>
+<td><code>dummy-python-shiny</code> + <code>dummy-python-dash</code> + <code>dummy-python-streamlit</code></td>
+</tr>
+<tr>
+<td>Test command</td>
+<td><code>devtools::test()</code> / <code>devtools::check()</code></td>
+<td><code>uv run pytest</code></td>
+</tr>
+<tr>
+<td>Regenerate docs from source</td>
+<td><code>devtools::document()</code> commits <code>man/</code> + <code>NAMESPACE</code></td>
+<td>not needed — mkdocstrings reads the source</td>
+</tr>
+<tr>
+<td>Getting the working copy into the dummy app</td>
+<td>automatic, <code>pkgload::load_all("../csiapps")</code></td>
+<td><code>pip install -e '../csiapps-py[extra]'</code></td>
+</tr>
+<tr>
+<td>Env vars for the CLI self-test</td>
+<td><code>.Renviron</code>, auto-loaded</td>
+<td>must be exported in the shell</td>
+</tr>
+<tr>
+<td>Integration branch</td>
+<td><strong><code>staging</code></strong></td>
+<td><strong><code>staging</code></strong></td>
+</tr>
+<tr>
+<td>Deploy pin</td>
+<td>generated <code>manifest.json</code>, pins an exact <code>GithubSHA1</code></td>
+<td>hand-edited <code>requirements.txt</code> line</td>
+</tr>
+<tr>
+<td>Pre-release deploy</td>
+<td><code>deploy.R</code> (defaults to <code>staging</code>); nothing to revert</td>
+<td>permanent <code>git+…@staging</code> line; manifest regenerated</td>
+</tr>
+<tr>
+<td>Publishing the deploy</td>
+<td><code>git push</code> the manifest; Connect Cloud rebuilds</td>
+<td>redeploy the app</td>
+</tr>
+<tr>
+<td>Distribution</td>
+<td>GitHub — no registry</td>
+<td>PyPI</td>
+</tr>
+<tr>
+<td>Effect of merging to <code>main</code></td>
+<td><strong>publishes</strong> to every <code>install_github()</code> consumer, and to the pkgdown site</td>
+<td>updates source/API docs; package consumers wait for <code>uv publish</code></td>
+</tr>
+<tr>
+<td>Version file</td>
+<td><code>DESCRIPTION</code></td>
+<td><code>pyproject.toml</code> + <code>__version__</code></td>
+</tr>
+<tr>
+<td>Version bumped at</td>
+<td>step 3, on <code>staging</code></td>
+<td>step 3, on <code>staging</code></td>
+</tr>
+<tr>
+<td>Release notes</td>
+<td>GitHub Release body</td>
+<td>tag / PyPI release notes</td>
+</tr>
+<tr>
+<td>Reference docs</td>
+<td>separate <a href="https://csiontario.github.io/csiapps-r/">pkgdown site</a>, auto-built from <code>main</code></td>
+<td><a href="../api/">mkdocstrings</a>, inside this site</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition question">
+<p class="admonition-title">Why does Python use <code>staging</code> when PyPI is already a gate?</p>
+<p>PyPI protects production package consumers, but it does not provide a
+deployed canary. The Python <code>staging</code> branch lets Posit Connect exercise an
+unreleased commit while production apps remain pinned to PyPI. It also
+keeps <code>main</code> aligned with releases, which matters because the official
+Python API reference is built from <code>csiapps-py@main</code>. The dummy apps remain
+on <code>staging</code> after a release so the next staged change reaches them
+automatically; they never follow <code>main</code> or a PyPI pin.</p>
+</div>
+<h2 id="notes">Notes</h2>
+<ul>
+<li><strong>Breaking changes</strong> to the app-wrapper contract (route paths, required env
+  vars, import locations) break already-deployed apps the moment they reinstall.
+  Call them out in the release notes and in the consumer-app bump so nobody is
+  surprised at redeploy time. If the change affects existing Python apps, add it
+  to <a href="../migrating/">Migrating Python apps</a>.</li>
+<li><strong>Keep the dummy apps in lockstep.</strong> If a change adds public surface, extend
+  the self-test in the dummy apps to cover it — the canary is only as good as
+  what it exercises.</li>
+<li><strong>A change to only one language is still a docs change.</strong> This site documents
+  both packages side by side, so a new function in one language either needs a
+  matching implementation in the other or a new row in the
+  <a href="../parity/">parity checklist</a> explaining the divergence.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.tabs.link", "content.code.copy", "navigation.sections"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
