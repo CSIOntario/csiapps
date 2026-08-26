@@ -8,37 +8,22 @@ Shiny wrappers. The two entry points are `attach()` and `layout_wrapper()`.
     Dash is a Python framework, so it has no R equivalent — R apps use
     [Shiny](shiny-apps.md). Everything below is Python.
 
-!!! note "Install the `dash` extra"
-    Since **0.3.0** the Dash wrappers live in the `csiapps.dash` submodule behind
-    an optional extra, symmetric with `csiapps[shiny]`:
+By default `csiapps` runs in **sandbox mode**, so the complete app can be built
+and tested locally before production credentials are introduced.
 
-    ```bash
-    pip install 'csiapps[dash]'
-    ```
+## Install
 
-    ```python
-    from csiapps.dash import attach, layout_wrapper
-    ```
+Install the optional Dash adapter:
 
-    The web frameworks are independent extras — a Dash app installs only Dash,
-    a Shiny app only Shiny, and a Streamlit app only Streamlit — while the core (`make_request`, the
-    `fetch_*` helpers, the sandbox) imports neither.
+```bash
+pip install 'csiapps[dash]'
+```
 
-By default `csiapps` runs in **sandbox mode**, so a wrapped app develops and runs
-locally *without* any OAuth client credentials — the auth guard is skipped
-entirely (see [Sandbox mode](#sandbox-mode) below and the dedicated
-[Sandbox mode](sandbox.md) article). The following environment variables are
-required only for a real deployment, once sandbox mode is off:
+```python
+from csiapps.dash import attach, layout_wrapper
+```
 
-- `CSIAPPS_CLIENT_ID` — client ID for the application registered in CSIAPPS.
-- `CSIAPPS_CLIENT_SECRET` — client secret for the application.
-- `CSIAPPS_REDIRECT_URI` — the OAuth redirect URL; **must end in `/redirect`**
-  (see [The redirect URI](#the-redirect-uri) below).
-- `CSIAPPS_SCOPE` — (optional) scope of the authentication request.
-- `CSIAPPS_SECRET_KEY` — signs the session cookie that holds the access token; a
-  **Dash-specific** requirement (see [The session secret key](#the-session-secret-key)).
-
-## A starting app
+## Starting app
 
 Suppose you already have this Dash app:
 
@@ -59,7 +44,9 @@ if __name__ == "__main__":
 To bring it into the CSIAPPS ecosystem you add two calls — `attach()` and
 `layout_wrapper()` — plus the usual `set_institute()` / `check_secrets()` setup.
 
-## 1. `set_institute()` and `check_secrets()`
+## Add the CSIAPPS wrapper
+
+### 1. `set_institute()` and `check_secrets()`
 
 Same as any csiapps app: choose the institute internal API calls target, then
 fail fast on a misconfigured deployment.
@@ -74,7 +61,7 @@ csiapps.set_institute("csiontario")
 csiapps.check_secrets(verbose=True)
 ```
 
-## 2. `attach()` — authentication and routes
+### 2. `attach()` — authentication and routes
 
 Call `attach(app)` **once, immediately after constructing the app and before
 assigning the layout**. In production it installs a `before_request` guard (via
@@ -97,7 +84,7 @@ production it additionally sets `Secure`/`HttpOnly`/`SameSite=Lax` on the sessio
 cookie and applies `ProxyFix` (Posit Connect Cloud terminates TLS upstream).
 Calling it twice on the same app is a no-op.
 
-## 3. `layout_wrapper()` — the CSI chrome
+### 3. `layout_wrapper()` — the CSI chrome
 
 Wrap your components in `layout_wrapper()` and assign the result to `app.layout`.
 It adds the CSI navbar, footer, auth-status line, and (in sandbox mode) the
@@ -109,7 +96,7 @@ from csiapps.dash import layout_wrapper
 
 app.layout = layout_wrapper(
     html.H3("Athletes"),
-    dcc.Dropdown(id="org", options=csiapps.fetch_org_options(), placeholder="Organisation"),
+    dcc.Dropdown(id="org", options=[], placeholder="Organisation"),
     dash_table.DataTable(id="people", page_size=10),
 )
 ```
@@ -127,20 +114,23 @@ The chrome CSS is served by `attach()` and linked from the layout, so **`attach(
 must be called for the styling to load** — no `external_stylesheets`, no
 `index_string` override, no `assets/` folder to vendor.
 
-## No reactive login gating — the guard handles it
+## Authentication and data access
 
 This is the key difference from Shiny. In a Shiny app, authentication is
 asynchronous and the `fetch_*` helpers **gate themselves** reactively until the
-token arrives (see [Shiny apps → Waiting for login](shiny-apps.md#waiting-for-login)).
+token arrives (see [Shiny apps → Authentication and data access](shiny-apps.md#authentication-and-data-access)).
 
-In Dash there is nothing to gate. `attach()`'s `before_request` guard runs the
-OAuth flow **before Dash renders anything**, so by the time any callback — or the
-per-request `layout_wrapper` callable — executes, the user is already
-authenticated and the token is in the Flask session. The `fetch_*` helpers pick
-it up on their own:
+In Dash there is nothing to gate reactively. `attach()`'s `before_request` guard
+runs the OAuth flow before Dash callbacks execute, so callbacks can use the
+`fetch_*` helpers without handling tokens. Keep authenticated reads in callbacks
+rather than at module import:
 
 ```python
 from dash import Input, Output, callback
+
+@callback(Output("org", "options"), Input("url", "pathname"))
+def load_organisations(_pathname):
+    return csiapps.fetch_org_options()
 
 @callback(Output("people", "data"), Input("org", "value"))
 def load_people(org):
@@ -152,11 +142,9 @@ def load_people(org):
     return [csiapps.flatten_profile(p) for p in profiles]
 ```
 
-Because the guard runs first, you can even call `fetch_org_options()` at layout
-time (as in step 3): `layout_wrapper` is invoked per-request, inside the request
-context, with the token already resolved. There is **no `dcc.Interval` login
-bounce, no `dcc.Location`, and no manual `Authorization` header** — the pattern
-older hand-rolled Dash apps needed.
+The `url` input triggers the initial organisation read after the page request
+has passed the guard. There is no polling login bounce and no manual
+`Authorization` header.
 
 !!! note "`token_ready()` still works"
     If you have work that must wait for login but does not itself call a
@@ -164,43 +152,7 @@ older hand-rolled Dash apps needed.
     available (reading the Flask session inside a request). Behind the guard it
     is essentially always `True`, so most Dash apps never need it.
 
-## The redirect URI
-
-The OAuth provider sends the browser back to `CSIAPPS_REDIRECT_URI` after login,
-and `attach()` handles that return on the **`/redirect`** route. So the value you
-register in CSIAPPS **and** set in the environment must end in `/redirect`:
-
-```bash
-# local
-CSIAPPS_REDIRECT_URI=http://127.0.0.1:8050/redirect
-# deployed
-CSIAPPS_REDIRECT_URI=https://your-app.example.ca/redirect
-```
-
-It must match the registered value **exactly** (OAuth providers match the
-redirect URI by scheme, host, and path). This is the same path the other CSI
-Dash apps register, so a migrating app keeps its registration unchanged.
-
-## The session secret key
-
-Dash stores the access token in a **Flask session cookie**, and `CSIAPPS_SECRET_KEY`
-signs that cookie. Generate a different key for each deployed Dash app, then keep
-that app's value **stable across restarts and workers**. It is not per-user or
-per-session, and it is not a package-wide key. Reusing one key across unrelated
-apps only increases the impact of a leak. `attach()` raises at startup in
-production if the key is missing or shorter than 32 characters. Generate it once
-per app:
-
-```bash
-python -c "import secrets; print(secrets.token_urlsafe(48))"
-```
-
-!!! info "Why Shiny doesn't need this"
-    Shiny keeps the token server-side in the per-session `session$userData`, so
-    there is no cookie to sign. Dash has no equivalent server-side session, hence
-    the signed cookie and the key. It is not needed in sandbox mode.
-
-## Full app
+## Full app example
 
 ```python
 import csiapps
@@ -210,15 +162,25 @@ from dash import Dash, Input, Output, callback, dash_table, dcc, html
 csiapps.set_institute("csiontario")
 csiapps.check_secrets(verbose=True)
 
+# Seed local data only in sandbox mode.
+if csiapps.is_sandbox_mode() and not csiapps.fetch_org_options():
+    csiapps.create_sport_org("Rowing Canada", id=100)
+    csiapps.create_profile(3, sport_org_id=100)
+
 app = Dash(__name__)
 attach(app)
 server = app.server   # for gunicorn / Posit Connect
 
 app.layout = layout_wrapper(
+    dcc.Location(id="url", refresh=False),
     html.H3("Athletes"),
-    dcc.Dropdown(id="org", options=csiapps.fetch_org_options(), placeholder="Organisation"),
+    dcc.Dropdown(id="org", options=[], placeholder="Organisation"),
     dash_table.DataTable(id="people", page_size=10),
 )
+
+@callback(Output("org", "options"), Input("url", "pathname"))
+def load_organisations(_pathname):
+    return csiapps.fetch_org_options()
 
 @callback(Output("people", "data"), Input("org", "value"))
 def load_people(org):
@@ -231,13 +193,7 @@ if __name__ == "__main__":
     app.run(debug=True, port=8050)
 ```
 
-A runnable example is in
-[`examples/dash_app.py`](https://github.com/CSIOntario/csiapps-py/blob/main/examples/dash_app.py)
-(`python examples/dash_app.py`), and a full four-tab reference app — the Dash
-twin of the Shiny canary — lives in
-[`dummy-python-dash`](https://github.com/CSIOntario/dummy-python-dash).
-
-## Sandbox mode
+## Local development in sandbox mode
 
 The code above is written for production, but you do **not** need client
 credentials or a running identity provider to develop it. In sandbox mode (the
@@ -257,6 +213,14 @@ attach(app)                        # sandbox: guard skipped, no credentials need
 app.layout = layout_wrapper(...)   # renders the sandbox banner + your components
 ```
 
+Run the app locally after seeding the sandbox:
+
+```bash
+export CSIAPPS_ENV=sandbox
+export CSIAPPS_ACCESS_TOKEN=your-dev-access-token
+python app.py
+```
+
 Set `CSIAPPS_ACCESS_TOKEN` to have the header show your real `/me` identity;
 otherwise the shell renders with an unauthenticated notice. Everything else —
 orgs, athletes, warehouse records — is dummy, served from the local sandbox. The
@@ -271,19 +235,35 @@ full local warehouse/registration workflow is in the
     Production is worker-count-agnostic (the token lives in the signed cookie,
     not process memory).
 
-## Deploying
+## Production configuration
 
-Because the app code is identical in both modes, deploying is just a matter of
-turning sandbox mode off — no code changes required.
+The app code does not change between environments. Set the following variables
+in the deployment environment:
 
-```python
-csiapps.set_sandbox_mode(False)   # or set CSIAPPS_ENV=production
+```text
+CSIAPPS_ENV=production
+CSIAPPS_CLIENT_ID=...
+CSIAPPS_CLIENT_SECRET=...
+CSIAPPS_REDIRECT_URI=https://your-app.example.ca/redirect
+CSIAPPS_SECRET_KEY=...
+CSIAPPS_SCOPE=read write
 ```
 
-Deploy as any Dash/Flask app (gunicorn, a container, or Posit Connect), with the
-OAuth client credentials, `CSIAPPS_SECRET_KEY`, and a registered
-`CSIAPPS_REDIRECT_URI` set in the deployment environment. Expose the WSGI server
-for the platform:
+The redirect URI registered in CSIAPPS must match the deployed value exactly and
+end in `/redirect`, which is the callback route installed by `attach()`.
+
+`CSIAPPS_SECRET_KEY` signs the Flask session cookie that holds the access token.
+Generate a different key for each deployment, keep it stable across restarts and
+workers, and use at least 32 characters:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(48))"
+```
+
+## Deploying
+
+Deploy as any Dash/Flask app (gunicorn, a container, or Posit Connect). Expose
+the WSGI server for the platform:
 
 ```python
 server = app.server   # gunicorn app:server  /  Posit Connect entrypoint "app:server"

@@ -4,10 +4,22 @@
 consistent CSI navbar/footer. The same wrappers exist in both languages:
 `ui_wrapper()` and `server_wrapper()`.
 
-!!! note "Python: install the `shiny` extra"
-    Since **0.3.0** the Python wrappers live in the `csiapps.shiny` submodule and
-    the Shiny dependency is optional. Install it with the extra and import from
-    the submodule:
+By default `csiapps` runs in **sandbox mode**, so a wrapped app can be developed
+locally without OAuth client credentials. Once the full app works locally, the
+same code moves to production with real environment variables.
+
+## Install
+
+=== "R"
+
+    ```r
+    remotes::install_github("CSIOntario/csiapps-r")
+    ```
+
+=== "Python"
+
+    Install the optional Shiny adapter and import the wrappers from its
+    submodule:
 
     ```bash
     pip install 'csiapps[shiny]'
@@ -17,22 +29,7 @@ consistent CSI navbar/footer. The same wrappers exist in both languages:
     from csiapps.shiny import ui_wrapper, server_wrapper
     ```
 
-    Upgrading an app written for an earlier version? See
-    [Migrating Python apps](migrating.md). (The R package is unaffected —
-    `ui_wrapper()` and `server_wrapper()` are exported directly as before.)
-
-By default `csiapps` runs in **sandbox mode**, so a wrapped app can be developed
-and run locally *without* any OAuth client credentials — the login redirect is
-simulated (see [Sandbox mode](#sandbox-mode) below and the dedicated
-[Sandbox mode](sandbox.md) article). The following environment variables are
-only required for a real deployment, once sandbox mode is turned off:
-
-- `CSIAPPS_CLIENT_ID` — client ID for the application registered in CSIAPPS.
-- `CSIAPPS_CLIENT_SECRET` — client secret for the application.
-- `CSIAPPS_REDIRECT_URI` — URL the application redirects to after authentication.
-- `CSIAPPS_SCOPE` — (optional) scope of the authentication request.
-
-## A starting app
+## Starting app
 
 Suppose you already have this Shiny app:
 
@@ -69,6 +66,8 @@ Suppose you already have this Shiny app:
     from shiny import App, render, ui
     import numpy as np
 
+    waiting = [43, 45, 50, 52, 56, 60, 65, 70, 75, 80]
+
     app_ui = ui.page_fluid(
         ui.panel_title("Old Faithful Geyser Data"),
         ui.layout_sidebar(
@@ -88,9 +87,11 @@ Suppose you already have this Shiny app:
     app = App(app_ui, server)
     ```
 
-To migrate this app into the CSIAPPS ecosystem, use the helpers below.
+To bring this app into the CSIAPPS ecosystem, add the wrapper calls below.
 
-## 1. `set_institute()`
+## Add the CSIAPPS wrapper
+
+### 1. `set_institute()`
 
 Specify which institute internal API calls (such as authentication redirects)
 target:
@@ -109,7 +110,7 @@ target:
     csiapps.set_institute("csiontario")
     ```
 
-## 2. `check_secrets()`
+### 2. `check_secrets()`
 
 Confirm the required environment variables are set. Pass `verbose=True` to print
 the values being checked (secrets masked). Outside sandbox mode it raises if a
@@ -128,7 +129,7 @@ mode it never raises and simply reports whether an access token was found.
     csiapps.check_secrets(verbose=False)
     ```
 
-## 3. Sharing globals with the server
+### 3. Sharing globals with the server
 
 === "R"
 
@@ -156,7 +157,7 @@ mode it never raises and simply reports whether an access token was found.
     `global_wrapper()` is therefore **R-only** — see the
     [parity checklist](parity.md).
 
-## 4. `ui_wrapper()` and `server_wrapper()`
+### 4. `ui_wrapper()` and `server_wrapper()`
 
 Wrap the UI and server. These add the CSI navbar/footer, an auth-status line,
 and the authentication flow (a real OAuth2 redirect in production, a simulated
@@ -184,77 +185,7 @@ login in sandbox mode).
     app = App(ui_wrapper(app_ui), server_wrapper(server))
     ```
 
-## Full migrated app
-
-=== "R"
-
-    ```r
-    library(shiny)
-    library(csiapps)
-
-    # CSIAPPS setup
-    set_institute("csiontario")
-    check_secrets()
-
-    global_wrapper({
-      df <- faithful[, 2]
-    })
-
-    ui <- fluidPage(
-      titlePanel("Old Faithful Geyser Data"),
-      sidebarLayout(
-        sidebarPanel(
-          sliderInput("bins", "Number of bins:", min = 1, max = 50, value = 30)
-        ),
-        mainPanel(plotOutput("distPlot"))
-      )
-    )
-
-    server <- function(input, output) {
-      output$distPlot <- renderPlot({
-        bins <- seq(min(df), max(df), length.out = input$bins + 1)
-        hist(df, breaks = bins, col = "darkgray", border = "white")
-      })
-    }
-
-    shinyApp(ui = ui_wrapper(ui), server = server_wrapper(server))
-    ```
-
-=== "Python"
-
-    ```python
-    from shiny import App, render, ui
-    import csiapps
-    from csiapps.shiny import ui_wrapper, server_wrapper
-
-    # CSIAPPS setup
-    csiapps.set_institute("csiontario")
-    csiapps.check_secrets()
-
-    app_ui = ui_wrapper(
-        ui.panel_title("Old Faithful Geyser Data"),
-        ui.layout_sidebar(
-            ui.sidebar(ui.input_slider("bins", "Number of bins:", 1, 50, 30)),
-            ui.output_plot("dist_plot"),
-        ),
-    )
-
-    def server(input, output, session):
-        @render.plot
-        def dist_plot():
-            import matplotlib.pyplot as plt
-            fig, ax = plt.subplots()
-            ax.hist(waiting, bins=input.bins(), color="darkgray", edgecolor="white")
-            return fig
-
-    app = App(app_ui, server_wrapper(server))
-    ```
-
-A runnable Python example is in
-[`examples/app.py`](https://github.com/CSIOntario/csiapps-py/blob/main/examples/app.py)
-(`shiny run --reload examples/app.py`).
-
-## Waiting for login
+## Authentication and data access
 
 In production, authentication is asynchronous: `server_wrapper()` redirects to
 CSIAPPS, and the user's access token only becomes available once they return and
@@ -336,7 +267,72 @@ reactive context, re-fires the guard automatically once login completes.
     guards pass immediately and the gating is invisible — it only matters once
     sandbox mode is off and a real, asynchronous login is involved.
 
-## Sandbox mode
+## Full app example
+
+=== "R"
+
+    ```r
+    library(shiny)
+    library(csiapps)
+
+    set_institute("csiontario")
+    check_secrets()
+
+    global_wrapper({
+      df <- faithful[, 2]
+    })
+
+    ui <- fluidPage(
+      titlePanel("Old Faithful Geyser Data"),
+      sidebarLayout(
+        sidebarPanel(
+          sliderInput("bins", "Number of bins:", min = 1, max = 50, value = 30)
+        ),
+        mainPanel(plotOutput("distPlot"))
+      )
+    )
+
+    server <- function(input, output) {
+      output$distPlot <- renderPlot({
+        bins <- seq(min(df), max(df), length.out = input$bins + 1)
+        hist(df, breaks = bins, col = "darkgray", border = "white")
+      })
+    }
+
+    shinyApp(ui = ui_wrapper(ui), server = server_wrapper(server))
+    ```
+
+=== "Python"
+
+    ```python
+    from shiny import App, render, ui
+    import csiapps
+    from csiapps.shiny import ui_wrapper, server_wrapper
+
+    csiapps.set_institute("csiontario")
+    csiapps.check_secrets()
+    waiting = [43, 45, 50, 52, 56, 60, 65, 70, 75, 80]
+
+    app_ui = ui_wrapper(
+        ui.panel_title("Old Faithful Geyser Data"),
+        ui.layout_sidebar(
+            ui.sidebar(ui.input_slider("bins", "Number of bins:", 1, 50, 30)),
+            ui.output_plot("dist_plot"),
+        ),
+    )
+
+    def server(input, output, session):
+        @render.plot
+        def dist_plot():
+            import matplotlib.pyplot as plt
+            fig, ax = plt.subplots()
+            ax.hist(waiting, bins=input.bins(), color="darkgray", edgecolor="white")
+            return fig
+
+    app = App(app_ui, server_wrapper(server))
+    ```
+
+## Local development in sandbox mode
 
 The code above is written for production, but you do **not** need client
 credentials or a running identity provider to develop it. In sandbox mode (the
@@ -346,15 +342,21 @@ the browser to CSIAPPS to authenticate, it seeds the session from the
 
 === "R"
 
-    ```r
-    Sys.setenv(CSIAPPS_ACCESS_TOKEN = "your-dev-access-token")
+    Put local values in an ignored `.Renviron` file:
+
+    ```text
+    CSIAPPS_ENV=sandbox
+    CSIAPPS_ACCESS_TOKEN=your-dev-access-token
     ```
+
+    Then run `shiny::runApp()` from the app directory.
 
 === "Python"
 
-    ```python
-    import os
-    os.environ["CSIAPPS_ACCESS_TOKEN"] = "your-dev-access-token"
+    ```bash
+    export CSIAPPS_ENV=sandbox
+    export CSIAPPS_ACCESS_TOKEN=your-dev-access-token
+    shiny run --reload app.py
     ```
 
 With that token set, the wrapped app runs locally and the header loads your
@@ -371,6 +373,17 @@ unauthenticated notice.
     registry. Only `/me` uses your real token — call `set_institute()` to match
     the institute that issued it, or that lookup is rejected.
 
+## Production configuration
+
+The app code does not change between environments. Set these variables in the
+deployment environment:
+
+- `CSIAPPS_ENV=production`
+- `CSIAPPS_CLIENT_ID`
+- `CSIAPPS_CLIENT_SECRET`
+- `CSIAPPS_REDIRECT_URI`
+- `CSIAPPS_SCOPE` (optional)
+
 ## Deploying
 
 Because the app code is identical in both modes, deploying is just a matter of
@@ -378,11 +391,7 @@ turning sandbox mode off — no code changes required.
 
 === "R"
 
-    ```r
-    options(csiapps.sandbox = FALSE)   # or set CSIAPPS_ENV=production
-    ```
-
-    Then generate a `manifest.json` from the app directory so the deployment
+    Generate a `manifest.json` from the app directory so the deployment
     target (Posit Connect / shinyapps.io) can reproduce your package
     environment; regenerate it whenever dependencies change:
 
@@ -391,10 +400,6 @@ turning sandbox mode off — no code changes required.
     ```
 
 === "Python"
-
-    ```python
-    csiapps.set_sandbox_mode(False)   # or set CSIAPPS_ENV=production
-    ```
 
     Deploy the app as you would any Shiny for Python app (for example
     `shiny run`, a container, or Posit Connect), with `CSIAPPS_ENV=production`

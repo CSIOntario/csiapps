@@ -141,7 +141,7 @@ before.
   still imported from the top-level `csiapps` package, with identical behaviour.
 - **Sandbox mode is still the default**, and the per-session token gating that
   lets `fetch_*()` wait for login is unchanged (see
-  [Shiny apps → Waiting for login](shiny-apps.md#waiting-for-login)).
+  [Shiny apps → Authentication and data access](shiny-apps.md#authentication-and-data-access)).
 - **`check_secrets()` and the OAuth2 environment variables** are the same.
 
 ## Bonus: pure-ingestion scripts get lighter

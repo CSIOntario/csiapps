@@ -130,7 +130,7 @@ deliberate hardening — same capability, adapted shape:
   non-secret placeholder so older apps that guard on
   `nzchar(Sys.getenv("CSIAPPS_ACCESS_TOKEN"))` keep working; Python needs no such
   shim, as it never wrote the token to the environment. See
-  [Waiting for login](shiny-apps.md#waiting-for-login).
+  [Authentication and data access](shiny-apps.md#authentication-and-data-access).
 
 ## Function reference
 
