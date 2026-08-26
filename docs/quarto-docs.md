@@ -1,18 +1,21 @@
 # Publishing authenticated Quarto documents
 
-`csiapps-quarto` applies the existing CSI login to a Quarto HTML document or
-dashboard and can generate a complete interactive snapshot for the signed-in
-viewer. Posit Connect Cloud hosts the live document, but **CSI sign-in is the
-only viewer authorization check**.
+`csiapps-quarto` applies the existing CSI login to an ordinary Quarto HTML
+document or dashboard. Posit Connect Cloud hosts the document, while CSI
+sign-in remains the viewer authorization check.
 
-The live deployment uses `server: shiny`. The downloaded snapshot is a single
-HTML file: it contains the registered session data and runs its filters, charts,
-value cards, and tables entirely in the browser. It does not contact Connect
-Cloud or a CSI data source after download.
+The core wrapper does three things:
+
+1. Shows only the CSI login shell to anonymous visitors.
+2. Reuses the existing per-session CSI authentication from `csiapps`.
+3. Sends the protected Quarto report body to the browser after login.
+
+Existing `csiapps` request, fetch, and ingestion functions remain the data
+access layer. The Quarto wrapper does not introduce a second client.
 
 ## Install
 
-Install the language-neutral extension in the Quarto project:
+Install the shared Quarto extension:
 
 ```bash
 quarto add CSIOntario/csiapps-quarto
@@ -46,124 +49,92 @@ filters:
 csiapps:
   institute: csiontario
   auth: csi
-  snapshot:
-    enabled: true
-    filename: "{slug}-{timestamp}.html"
 ---
 ```
 
-`auth: csi` without `server: shiny` is a build error. Use `auth: none` only for
-a genuinely public/static document. Snapshot downloads are disabled unless
-`snapshot.enabled` is true.
+`auth: csi` requires `server: shiny`. Use `auth: none` only for a genuinely
+public document.
 
-## Register the viewer's data
-
-Call the adapter once from the document's server-executed code. The provider is
-not evaluated until CSI login succeeds, and it runs in that viewer's session.
+## Attach authentication
 
 === "R"
 
+    Put `server.R` beside the `.qmd` file:
+
     ```r
-    csiapps::quarto_setup(
-      snapshot_data = function() {
-        list(athletes = csiapps::fetch_profiles())
-      }
-    )
+    function(input, output, session) {
+      csiapps::quarto_setup()
+    }
     ```
+
+    Authenticated R server code must live in `server.R`. Inline
+    `context: server` chunks are rejected because Quarto serializes their
+    source into the rendered HTML.
 
 === "Python"
 
+    Put this in a normal Python cell. Quarto runs normal Python cells once
+    during rendering and again for each viewer session; `quarto_setup()` is a
+    no-op during rendering.
+
     ```python
-    import csiapps
     from csiapps.quarto import quarto_setup
 
-    quarto_setup(
-        snapshot_data=lambda: {
-            "athletes": csiapps.fetch_profiles()
-        }
-    )
+    quarto_setup()
     ```
 
-Each result must be a named tabular dataset. R accepts data frames or lists of
-named records. Python accepts Pandas data frames or lists of dictionaries.
-Missing values become JSON `null`; dates use ISO 8601; integers too large for
-JavaScript are encoded as strings.
+After setup, use the existing `csiapps` functions from authenticated server
+code just as you would in a Shiny application. Token resolution remains
+session-aware; credentials and API configuration stay on the server.
 
-The adapter sends only the protected report body and registered data to the
-browser. OAuth tokens, secrets, and data-source configuration remain on the
-server.
+## Author the report
 
-## Add interactive components
+Write ordinary Quarto Markdown, cards, tabs, pages, citations, static media,
+and supported Shiny outputs. No CSI-specific chart, table, or filter syntax is
+required for the core wrapper.
 
-Components are ordinary Quarto fenced divs, so their source is identical in R
-and Python:
+## Run locally
 
-```markdown
-::: {.csi-filter dataset="athletes" field="sport"
-      type="multiselect" group="main" label="Sport"}
-:::
+From the document directory, run:
 
-::: {.csi-value dataset="athletes" operation="count"
-      group="main" label="Athletes"}
-:::
-
-::: {.csi-chart dataset="athletes" type="scatter"
-      x="age" y="score" group="main"}
-:::
-
-::: {.csi-table dataset="athletes"
-      columns="name,sport,age,score" group="main"}
-:::
+```bash
+quarto preview index.qmd
 ```
 
-Components with the same `dataset` and `group` share filters.
-
-| Component | V1 options |
-|---|---|
-| `.csi-filter` | `select`, `multiselect`, `numeric-range`, `date-range` |
-| `.csi-value` | `count`, `sum`, `mean`, `minimum`, `maximum` |
-| `.csi-chart` | `bar`, `line`, `scatter`, `histogram` |
-| `.csi-table` | Search, sort, pagination, declared columns |
-
-Quarto prose, cards, tabs, pages, citations, and static images remain part of
-the report. Mark server-only content `.csi-live-only`; the snapshot removes it.
-When snapshots are enabled, detectable Shiny or HTML-widget output that is not
-marked `.csi-live-only` stops the render with a validation error. Maps,
-arbitrary widgets, and offline Shiny callbacks are not supported in V1.
-
-## What the snapshot contains
-
-When the viewer chooses **Download interactive snapshot**, the extension:
-
-1. Captures the current filters, table state, and active tabs.
-2. Includes every row of every registered session dataset, even rows currently
-   hidden by filters.
-3. Embeds the report, styles, images, runtime, data, and saved state in one HTML
-   file.
-4. Opens the file at the saved state while allowing filters to reset and expose
-   the complete embedded data.
-
-The snapshot is unencrypted and has no post-download authentication. Treat it
-like any other complete data export and distribute it only to authorized
-individuals. Generation fails rather than silently omitting data or a resource.
+Use the URL printed by Quarto. Opening the generated HTML directly cannot run
+the Shiny server or complete CSI authentication.
 
 ## Deploy to Connect Cloud
 
-1. Publish the `.qmd` file (or `_quarto.yml`) as the primary file.
-2. Include the installed `_extensions/csiapps` directory and the R
-   `manifest.json` or Python `requirements.txt` in the deployment source.
-3. Set `CSIAPPS_ENV=production` and the existing CSI OAuth client variables in
+1. Publish `index.qmd` as the primary file.
+2. Include `_extensions/csiapps` and the R `server.R` and `manifest.json`, or
+   the Python `requirements.txt`, in the deployment source.
+3. Set `CSIAPPS_ENV=production` and the existing CSI OAuth variables in
    Connect Cloud's secret Variables panel.
 4. Register the deployed callback URL with CSIAPPS.
-5. Enable **Public Access** in Connect Cloud. This makes the CSI login shell
-   reachable; it does not reveal the report body or load data before CSI login.
-6. Verify an anonymous visit receives only the login shell, CSI login reveals
-   the report, and the downloaded snapshot works after the browser is offline.
+5. Enable **Public Access** so visitors can reach the CSI login shell.
 
-The extension writes `.csiapps-protected-body.html` during Quarto rendering.
-It is an internal application file, not a web asset. The deployment canary must
-confirm that requesting this filename directly returns 404 before release.
+The extension writes `.csiapps-protected-body.html` while rendering. It is an
+internal application file, not a public web asset.
 
-Do not commit credentials or private datasets to the deployment repository.
-Authentication protects the running document, not source files already placed
-in a public Git repository.
+## Core production gate
+
+Before release, verify both R and Python canaries:
+
+- Anonymous visitors receive only the CSI login shell.
+- The initial response contains no report body or protected data.
+- CSI login reveals the protected document.
+- Logout or session expiry removes the document and returns to sign-in.
+- Two simultaneous viewers have independent sessions.
+- A direct request for `.csiapps-protected-body.html` returns 404.
+- The sandbox self-test board is green in both canaries.
+- The live board exercises authenticated organisation/profile reads and reports
+  a green ingest/retrieve round-trip when `CSIAPPS_TEST_SOURCE_UUID` is set.
+- The Registry and Warehouse controls work inside the dynamically injected
+  Quarto body, confirming that its Shiny inputs and outputs were rebound.
+
+## Deferred: downloadable snapshots
+
+Interactive HTML snapshot downloads are intentionally disabled in the core
+release. They will be added and production-tested as a separate optional layer
+after both authentication canaries pass.

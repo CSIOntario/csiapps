@@ -50,16 +50,15 @@ both — with two exceptions that are intentional and explained under
 
 ## Quarto documents
 
-Both languages use the same `csiapps-quarto` extension, YAML, fenced-div
-components, and browser snapshot runtime.
+Both languages use the same `csiapps-quarto` extension and YAML. R places
+`quarto_setup()` in Quarto's native `server.R`; Quarto generates the
+corresponding Python app runtime from the Python document.
 
 | Capability | R | Python |
 |---|---|---|
-| Attach CSI auth and register snapshot data | `quarto_setup()` | `csiapps.quarto.quarto_setup()` |
+| Attach CSI authentication | `quarto_setup()` | `csiapps.quarto.quarto_setup()` |
 | Install runtime dependency | Included with the R package | `csiapps[quarto]` |
-| Accepted tabular data | Named data frames / record lists | Mapping of Pandas data frames / record lists |
 | Per-viewer session token | Existing Shiny session token | Existing Shiny session token |
-| Offline interactive snapshot | Language-neutral extension runtime | Language-neutral extension runtime |
 
 ## Dash app wrappers (Python only)
 

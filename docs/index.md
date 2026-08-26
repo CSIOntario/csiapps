@@ -87,7 +87,7 @@ never hit the production warehouse by accident:
 - **[Streamlit apps](streamlit-apps.md)** — secure OAuth2 PKCE through a native
   Streamlit entrypoint using `page_wrapper`.
 - **[Quarto documents](quarto-docs.md)** — publish a CSI-authenticated report to
-  Connect Cloud and optionally download a complete interactive HTML snapshot.
+  Connect Cloud using the existing R or Python client.
 - **[Migrating Python apps](migrating.md)** — upgrade a pre-0.3 Python app to the
   new `csiapps[shiny]` extra and `csiapps.shiny` imports.
 - **[REST API](rest-api.md)** — `make_request` and the registration helpers.

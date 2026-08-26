@@ -22,8 +22,7 @@ regression harnesses:
 
     - [`dummy-r-shiny`](https://github.com/CSIOntario/dummy-r-shiny) — the Shiny
       canary, and the only one R needs (there is no R Dash package).
-    - `dummy-r-quarto` — the authenticated Quarto document and offline-snapshot
-      canary.
+    - `dummy-r-quarto` — the authenticated R Quarto document canary.
 
 === "Python"
 
@@ -33,8 +32,7 @@ regression harnesses:
       the Dash canary.
     - [`dummy-python-streamlit`](https://github.com/CSIOntario/dummy-python-streamlit) —
       the native Streamlit canary for Posit Connect Cloud.
-    - `dummy-python-quarto` — the Python Quarto document and offline-snapshot
-      canary.
+    - `dummy-python-quarto` — the authenticated Python Quarto document canary.
 
 Together they exercise the relevant `csiapps` public surface. Every release
 validates the dummy apps twice: first **locally**, where the sandbox self-test
@@ -45,9 +43,12 @@ boards (sandbox + live) is our evidence that a change is safe.
 For a Quarto change, deploy both `dummy-r-quarto` and
 `dummy-python-quarto` to **Connect Cloud** from `staging`. Connect Cloud is the
 primary release gate: verify the anonymous login shell, two-viewer isolation,
-snapshot completeness, and fully offline reopening there. Then run a secondary
-smoke deployment on self-hosted Posit Connect. Only the exact commit that passes
-both checks may advance from `staging` to `main` and receive a version tag.
+protected-body delivery, logout, a 404 for the internal body file, both
+self-test boards, authenticated Registry reads, and the Warehouse round-trip.
+Then run a secondary smoke deployment on self-hosted Posit Connect. Snapshot
+validation is deferred until that optional layer enters development. Only the
+exact commit that passes both checks may advance from `staging` to `main` and
+receive a version tag.
 
 ## The loop
 
