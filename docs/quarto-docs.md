@@ -21,7 +21,7 @@ Install the matching language adapter:
 === "R"
 
     ```r
-    remotes::install_github("CSIOntario/csiapps-r@v0.2.0")
+    remotes::install_github("CSIOntario/csiapps-r")
     ```
 
 === "Python"
@@ -30,7 +30,8 @@ Install the matching language adapter:
     pip install 'csiapps[quarto]'
     ```
 
-Quarto 1.9 or newer is required.
+The R Quarto adapter requires `csiapps` 0.2.0 or newer. The unpinned command
+above installs the latest version. Quarto 1.9 or newer is also required.
 
 ## Starting document
 
