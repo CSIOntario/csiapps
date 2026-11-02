@@ -116,8 +116,10 @@ deliberate hardening — same capability, adapted shape:
   `jsonvalidate`) in R and `jsonschema` (Draft 7) in Python. Error wording and
   some `format`-keyword edge cases differ.
 - **`fetch_profiles()` pagination guard.** The Python port adds a `max_pages`
-  bound with cycle detection and a truncation warning; the R version paginates
-  until the API stops returning a `next` link. Python is a hardened superset.
+  bound with cycle detection and a truncation warning. R 0.2.1 follows `next`
+  links or count/offset responses; its profile helper has no user-configurable
+  page bound. R's generic `make_request()` raises an error when its configured
+  page bound would return incomplete results.
 - **Per-session token storage.** Both packages store the logged-in user's access
   token per session (never a process-global) and resolve it reactively, so
   `make_request()` / `fetch_*()` gate themselves until login completes and
@@ -131,6 +133,20 @@ deliberate hardening — same capability, adapted shape:
   `nzchar(Sys.getenv("CSIAPPS_ACCESS_TOKEN"))` keep working; Python needs no such
   shim, as it never wrote the token to the environment. See
   [Authentication and data access](shiny-apps.md#authentication-and-data-access).
+
+## R 0.2.1 request compatibility
+
+R 0.2.1 adds `query_multi`, `retry_max_tries` and
+`retry_is_transient` options to `make_request()`. It supports count/offset
+pagination when next links are absent or null and raises an error when
+`max_pages` would truncate a response. Existing scalar-query and retry defaults
+remain available; writes can opt out of automatic retries with
+`retry_max_tries = 1`. These public options are R-only; the Python API is unchanged
+by this release.
+
+R browser sessions use their own token exclusively; the environment-token
+fallback applies outside Shiny. Rejected session tokens clear authentication.
+Public PKCE clients omit Basic authentication when no client secret is configured.
 
 ## Function reference
 

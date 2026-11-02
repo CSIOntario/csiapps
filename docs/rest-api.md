@@ -369,3 +369,21 @@ In short: the **warehouse** examples work in both modes, while the
 For registration data in sandbox, use the `fetch_*` helpers, which read the
 local dummy registry directly. The full sandbox workflow is documented in
 **[Sandbox mode](sandbox.md)**.
+
+## R request controls (0.2.1)
+
+Starting in R 0.2.1, repeated athlete filters can be sent with
+`query = list(subject = c(1L, 2L)), query_multi = "explode"`. Set
+`retry_max_tries = 1L` for a write that must not be repeated automatically.
+`retry_is_transient` optionally accepts an httr2 response predicate for read retries.
+
+With `paginate = TRUE`, the client follows next links or advances limit/offset
+using the returned count and actual page size. If `max_pages` is reached while
+more records remain, the request fails rather than returning incomplete data.
+These controls do not change the package's default sandbox routing.
+
+The existing retry default remains three attempts. The new arguments are added
+after the existing arguments, so existing positional calls remain compatible.
+For pagination, `max_pages` still defaults to 50; increase it when more pages
+are expected. Callers that previously accepted a truncated response must now
+handle the error or increase the limit.

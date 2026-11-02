@@ -204,6 +204,15 @@ the data helpers gate themselves:
 - Called outside a session (a script or the R console) with no token, they raise
   a clear "not authenticated" error.
 
+In R 0.2.1, a browser session uses only its own token. Setting
+`CSIAPPS_ACCESS_TOKEN` does not authenticate a signed-out production session;
+the environment-token fallback is for scripts and the R console. The sandbox
+wrapper can still explicitly seed a session from a developer token at startup.
+If an API request rejects the session token with HTTP 401, the package clears
+that token and offers sign-in again. Token-exchange failures also show a
+recoverable authentication error. Apps should gate protected outputs on
+`token_ready()` and clear cached data when authentication is lost.
+
 The practical consequence: **fetch data from inside the server, not while
 building the UI.** A call placed in the UI definition runs once at startup, when
 no session and no token exist yet. Populate inputs from a reactive instead.
@@ -383,6 +392,11 @@ deployment environment:
 - `CSIAPPS_CLIENT_SECRET`
 - `CSIAPPS_REDIRECT_URI`
 - `CSIAPPS_SCOPE` (optional)
+
+R 0.2.1 supports both confidential clients and public PKCE clients. Configure
+`CSIAPPS_CLIENT_SECRET` for a confidential client; leave it unset or empty only
+when the OAuth application is registered as a public client. Public clients
+still require the client ID and registered redirect URI.
 
 ## Deploying
 
