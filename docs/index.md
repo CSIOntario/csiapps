@@ -2,9 +2,9 @@
 
 Helper functions and utilities for CSI data warehouse ingestion and
 [Shiny](https://shiny.posit.co/), Dash, Streamlit, and authenticated interactive
-Quarto documents. `csiapps` ships as **two
-packages with full feature parity** — one for R, one for Python — so a team can
-work in either language against the same CSIAPPS warehouse and registration API.
+Quarto documents. `csiapps` ships as **two packages**, one for R and one for
+Python, with a shared warehouse, registration, and sandbox API. Framework support
+and language-specific differences are listed in the [parity checklist](parity.md).
 
 This site documents **both**: every tutorial shows the R and the Python code
 side by side. Pick your language with the tabs and it stays selected across the
@@ -27,6 +27,14 @@ The library has three layers:
   `csiapps.quarto.quarto_setup()` in Python. The
   API client and sandbox above depend on no web framework; see
   [Migrating Python apps](migrating.md).
+
+## Python 0.5.1
+
+[Python 0.5.1 is published on PyPI](https://pypi.org/project/csiapps/0.5.1/).
+It improves browser-session isolation, sign-in recovery, pagination and retry
+controls, and Shiny/Quarto compatibility with concurrent reactive effects.
+See the [release notes](release-notes.md#python-051) and
+[upgrade guidance](migrating.md#updating-to-python-051) before updating an app.
 
 ## Installation
 
@@ -88,8 +96,9 @@ never hit the production warehouse by accident:
   Streamlit entrypoint using `page_wrapper`.
 - **[Quarto documents](quarto-docs.md)** — publish a CSI-authenticated report to
   Connect Cloud using the existing R or Python client.
-- **[Migrating Python apps](migrating.md)** — upgrade a pre-0.3 Python app to the
-  new `csiapps[shiny]` extra and `csiapps.shiny` imports.
+- **[Migrating Python apps](migrating.md)** — review 0.5.1 behavior changes and
+  the framework import changes needed by pre-0.3 apps.
+- **[Release notes](release-notes.md)** — published changes and upgrade links.
 - **[REST API](rest-api.md)** — `make_request` and the registration helpers.
 - **[Sandbox mode](sandbox.md)** — the full local warehouse/registration
   workflow.

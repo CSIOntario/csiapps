@@ -111,7 +111,9 @@ and remove the protected body; the viewer can then sign in again. Ordinary
 permission-denied responses preserve the session. Update the shared extension
 with `quarto add CSIOntario/csiapps-quarto` and re-render the document to obtain
 OAuth callback-query cleanup: `code` and `state` are removed while unrelated
-query parameters remain. App-specific caches must stay scoped to the viewer.
+query parameters remain. The unqualified command installs from the extension's
+`main` branch, as described in [Quarto's extension distribution guide](https://quarto.org/docs/extensions/distributing).
+App-specific caches must stay scoped to the viewer.
 
 ## Full document example
 
@@ -302,6 +304,8 @@ CSIAPPS_REDIRECT_URI=https://your-quarto-document.example/
 CSIAPPS_SCOPE=read write
 ```
 
+`CSIAPPS_CLIENT_SECRET` is optional for a registered public PKCE client with
+R 0.2.1 or Python 0.5.1. Confidential clients still supply their configured secret.
 Register the exact deployed URL as the redirect URI. Do not commit credentials
 or private data to the document source.
 

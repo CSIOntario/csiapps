@@ -1,5 +1,5 @@
 site_name: csiapps
-site_description: Helper functions for CSI data warehouse ingestion and Shiny, Dash, and Streamlit apps
+site_description: Helper functions for CSI data warehouse ingestion, web apps, and authenticated Quarto documents
 repo_url: https://github.com/CSIOntario/csiapps
 theme:
   name: material
@@ -57,6 +57,7 @@ nav:
       - Quarto documents: quarto-docs.md
       - REST API: rest-api.md
       - Sandbox mode: sandbox.md
+  - Release notes: release-notes.md
   - Migrating Python apps: migrating.md
   - Parity checklist: parity.md
   - Releasing csiapps: releasing.md

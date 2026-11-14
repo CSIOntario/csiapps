@@ -6,9 +6,10 @@ plus registration helpers (`fetch_org_options()`, `fetch_profiles()`,
 [CSIAPPS Swagger docs](https://apps.csiontario.ca/api/swagger/) for every
 endpoint, parameter, and response shape.
 
-To reach the **real** API you need an access token in `CSIAPPS_ACCESS_TOKEN`
-(outside a Shiny app) or the per-session token stored by `server_wrapper()`
-(inside one).
+To reach the **real** API, scripts can use `CSIAPPS_ACCESS_TOKEN` or an explicit
+`token` argument. Wrapped Shiny, Dash, Streamlit, and Quarto apps use the current
+viewer's session token. An environment token does not authenticate a signed-out
+production browser.
 
 !!! note "Sandbox mode is the default"
     The **warehouse** `make_request()` calls below are routed to a local,

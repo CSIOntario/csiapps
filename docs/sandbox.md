@@ -15,17 +15,40 @@ no changes to your app code.
 
 ## What is real and what is dummy
 
-Sandbox mode fakes everything except the one thing it cannot fake safely — your
-identity:
+Sandbox mode does not require credentials or a CSI login. Wrapped apps can
+optionally use a developer token to show a real name in their header:
 
 | Concern | In sandbox mode |
 | --- | --- |
-| **Login / `/me` identity** | Emulated using your real `CSIAPPS_ACCESS_TOKEN`, used *only* to load `/me` so a wrapped app's header shows your real name. |
+| **Login / `/me` identity** | No OAuth login is required. If you explicitly provide `CSIAPPS_ACCESS_TOKEN`, the wrapper may call the real `/me` endpoint to display your name. With no token, it skips that identity lookup. |
 | **Sport organizations** | Dummy. Created locally with `create_sport_org()`. |
 | **Athlete profiles** | Dummy. Created locally with `create_profile()`. |
 | **Warehouse schemas & records** | Dummy. Registered and ingested into an in-memory warehouse; nothing leaves your machine. |
 
-No real client data is ever read except your own `/me` identity.
+Sandbox registration and warehouse calls use local fixtures. The optional
+`/me` header lookup is a real network request; leave `CSIAPPS_ACCESS_TOKEN`
+unset or empty for an entirely credential-free sandbox run.
+
+## Local apps and dummy test suites
+
+Localhost does not select sandbox mode. `CSIAPPS_ENV=production`, an explicit
+package setting, or a wrapper's `sandbox=False` can enable real login and data
+requests while an app runs locally. Python dummy apps load `.env` during app
+startup; their example files enable production mode.
+
+For a credential-free Python Shiny dummy app, launch it with explicit sandbox
+settings and an empty token:
+
+```bash
+CSIAPPS_ENV=sandbox CSIAPPS_ACCESS_TOKEN= .venv/bin/shiny run --reload --port 8000 app.py
+```
+
+`python selftest.py` runs the dummy's sandbox suite without loading `.env`.
+The in-app sandbox board also preserves the viewer's existing login state.
+The separate live board runs after real login and can perform a test-source
+ingest round-trip when `CSIAPPS_TEST_SOURCE_UUID` is configured. See the
+[release validation guide](releasing.md#2-validate-against-the-dummy-apps-locally)
+for launch and test details.
 
 ## Enabling and disabling
 

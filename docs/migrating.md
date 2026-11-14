@@ -1,4 +1,8 @@
-# Migrating Python apps to 0.3.0
+# Migrating Python apps
+
+For the current release, start with [Updating to Python 0.5.1](#updating-to-python-051).
+If your app uses a version before 0.3.0, also apply the install and import changes
+below. The examples in the first sections explain that earlier transition.
 
 Python **0.3.0** makes the web frameworks optional. Earlier versions installed
 Shiny as a hard dependency and exported `ui_wrapper` / `server_wrapper` from the
@@ -89,7 +93,7 @@ by name:
 === "Before (≤ 0.2.x)"
 
     ```python
-    from shiny import App, render, ui
+    from shiny import App, reactive, render, ui
     import csiapps
 
     csiapps.set_institute("csiontario")
@@ -110,7 +114,7 @@ by name:
 === "After (0.3.0)"
 
     ```python
-    from shiny import App, render, ui
+    from shiny import App, reactive, render, ui
     import csiapps
     from csiapps.shiny import ui_wrapper, server_wrapper
 
@@ -173,8 +177,11 @@ by the core. See the [Dash apps](dash-apps.md) or
 
 ## Updating to Python 0.5.1
 
-Existing framework imports and install extras stay the same. Review these
-behavior changes when upgrading:
+For apps already using 0.3.0 or later, framework imports and install extras stay
+the same. Pin the extra for the framework your app uses, for example
+`csiapps[shiny]==0.5.1`; the other choices are `[dash]`, `[streamlit]`, and `[quarto]`.
+See the [release notes](release-notes.md#python-051) for the published release.
+Review these behavior changes when upgrading:
 
 - A production browser uses its own token exclusively. Environment tokens no
   longer authenticate a signed-out browser; scripts and explicit sandbox
@@ -196,7 +203,7 @@ behavior changes when upgrading:
 - Refresh the shared Quarto extension and re-render documents for callback
   query cleanup. Python does not duplicate the extension's browser runtime.
 
-## Checklist
+## Checklist for apps using versions before 0.3.0 {#checklist}
 
 - [ ] Changed `csiapps` → `csiapps[shiny]` in every dependency manifest
       (`requirements.txt`, `pyproject.toml`, and any deployment/`manifest.json`).
@@ -207,3 +214,16 @@ behavior changes when upgrading:
 - [ ] Reinstalled (`pip install -e .` or `pip install -r requirements.txt`) and
       confirmed the app starts.
 - [ ] Redeployed so the build environment picks up the `[shiny]` extra.
+
+## Validation when updating to 0.5.1
+
+- [ ] Pin the matching framework extra to `0.5.1` and reinstall it in a clean
+      environment matching your deployment Python version.
+- [ ] Run existing app tests and sandbox checks without credentials. If a test
+      sets only `CSIAPPS_ACCESS_TOKEN`, check whether it is simulating a script
+      or a browser: production browsers require their own session token.
+- [ ] Check sign-in, protected data, sign-out, and sign-in again in the deployed
+      app. Verify session expiry recovery and ordinary permission-error handling.
+- [ ] Handle incomplete-pagination errors and review retries on writes.
+- [ ] Scope cached data to the current viewer and clear it when their identity
+      is lost. Refresh the shared extension when updating a Quarto document.
