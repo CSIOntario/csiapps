@@ -1,8 +1,9 @@
 # Python API reference
 
 The framework-independent API exported from the top-level `csiapps` Python
-package, plus the app wrappers in the `csiapps.shiny`, `csiapps.dash`, and
-`csiapps.streamlit` submodules (installed with the matching optional extra).
+package, plus the app wrappers in the `csiapps.shiny`, `csiapps.dash`,
+`csiapps.streamlit`, and `csiapps.quarto` submodules (installed with the matching
+optional extra).
 For the R package, see the
 [R reference](https://csiontario.github.io/csiapps-r/reference/) (pkgdown); for
 how the two map onto each other, see the [parity checklist](parity.md).
@@ -19,7 +20,11 @@ how the two map onto each other, see the [parity checklist](parity.md).
 
 ## Client
 
+::: csiapps.client.AuthenticationError
 ::: csiapps.client.make_request
+    options:
+      docstring_options:
+        warn_missing_types: false
 ::: csiapps.client.fetch_ams_mapping
 ::: csiapps.client.fetch_org_options
 ::: csiapps.client.fetch_profiles
@@ -56,3 +61,11 @@ Import these from `csiapps.streamlit` (requires the `csiapps[streamlit]` extra).
 See the [Streamlit apps](streamlit-apps.md) tutorial.
 
 ::: csiapps.streamlit.page_wrapper
+
+
+## Quarto document wrapper
+
+Import this from `csiapps.quarto` (requires the `csiapps[quarto]` extra).
+See [Quarto documents](quarto-docs.md).
+
+::: csiapps.quarto.quarto_setup

@@ -204,14 +204,21 @@ the data helpers gate themselves:
 - Called outside a session (a script or the R console) with no token, they raise
   a clear "not authenticated" error.
 
-In R 0.2.1, a browser session uses only its own token. Setting
+In R 0.2.1 and Python 0.5.1, a browser session uses only its own token. Setting
 `CSIAPPS_ACCESS_TOKEN` does not authenticate a signed-out production session;
 the environment-token fallback is for scripts and the R console. The sandbox
 wrapper can still explicitly seed a session from a developer token at startup.
 If an API request rejects the session token with HTTP 401, the package clears
 that token and offers sign-in again. Token-exchange failures also show a
-recoverable authentication error. Apps should gate protected outputs on
+recoverable authentication error. Python 0.5.1 also recognizes the API's explicit
+missing-credentials and invalid-token 403 responses. Other 403 responses,
+including permission denials and requests to select an active profile, leave the
+session signed in. `token_ready()` reports token availability; it does not
+validate that token with the API. Apps should gate protected outputs on
 `token_ready()` and clear cached data when authentication is lost.
+
+Public OAuth PKCE clients may omit `CSIAPPS_CLIENT_SECRET`. A confidential client
+still supplies its configured secret.
 
 The practical consequence: **fetch data from inside the server, not while
 building the UI.** A call placed in the UI definition runs once at startup, when

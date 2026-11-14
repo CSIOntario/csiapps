@@ -115,11 +115,11 @@ deliberate hardening — same capability, adapted shape:
 - **Schema validator engine.** Sandbox ingestion validates with Ajv (via
   `jsonvalidate`) in R and `jsonschema` (Draft 7) in Python. Error wording and
   some `format`-keyword edge cases differ.
-- **`fetch_profiles()` pagination guard.** The Python port adds a `max_pages`
-  bound with cycle detection and a truncation warning. R 0.2.1 follows `next`
-  links or count/offset responses; its profile helper has no user-configurable
-  page bound. R's generic `make_request()` raises an error when its configured
-  page bound would return incomplete results.
+- **`fetch_profiles()` pagination guard.** Python 0.5.1 raises an error if a
+  page limit, repeated URL, or premature empty page would return incomplete
+  results. R 0.2.1 follows `next` links or count/offset responses; its profile
+  helper has no user-configurable page bound. Both generic `make_request()`
+  clients raise an error when their configured page bound would truncate data.
 - **Per-session token storage.** Both packages store the logged-in user's access
   token per session (never a process-global) and resolve it reactively, so
   `make_request()` / `fetch_*()` gate themselves until login completes and
@@ -141,12 +141,20 @@ R 0.2.1 adds `query_multi`, `retry_max_tries` and
 pagination when next links are absent or null and raises an error when
 `max_pages` would truncate a response. Existing scalar-query and retry defaults
 remain available; writes can opt out of automatic retries with
-`retry_max_tries = 1`. These public options are R-only; the Python API is unchanged
-by this release.
+`retry_max_tries = 1`. Python 0.5.1 provides `retry_max_tries` and
+`retry_is_transient` too; its predicate receives an `httpx.Response`. Python
+uses native list-valued query arguments, such as `query={"subject": [1, 2]}`,
+for repeated parameters, so it does not need R's `query_multi` option.
 
 R browser sessions use their own token exclusively; the environment-token
 fallback applies outside Shiny. Rejected session tokens clear authentication.
 Public PKCE clients omit Basic authentication when no client secret is configured.
+Python 0.5.1 applies the same session-token isolation and public PKCE behavior
+across Shiny, Dash, Streamlit, and Quarto. Dash and Streamlit retain their
+separate session-key requirement. Python also recognizes a 403 whose JSON
+`detail` is exactly `Authentication credentials were not provided.` or
+`Invalid token.` as authentication rejection; permission and active-profile
+403 responses preserve the session. R's rejection handling currently uses 401.
 
 ## Function reference
 

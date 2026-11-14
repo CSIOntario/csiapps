@@ -120,6 +120,20 @@ def dashboard():
 page_wrapper(dashboard)
 ```
 
+## Session expiry and sign-in recovery
+
+Python 0.5.1 uses only the current Streamlit session's token in production;
+`CSIAPPS_ACCESS_TOKEN` remains a script fallback and optional sandbox seed.
+When a token expires or the API rejects it with 401 or an explicit
+missing-credentials/invalid-token 403, the page reruns into sign-in before
+protected app logic can continue. Other 403 responses preserve authentication.
+Logout and failed login remain paused until the viewer chooses to sign in.
+Keep any app-specific cached data scoped to that viewer and clear it when the
+identity changes.
+
+Start the app with `streamlit run app.py` in a terminal. An editor's ordinary
+Python Run button does not start Streamlit's web server.
+
 ## Local development in sandbox mode
 
 Sandbox mode is the fail-safe default and skips OAuth. Run the complete app
@@ -155,6 +169,10 @@ CSIAPPS_SCOPE=read write
 outside local development, and contain no credentials, query string, or
 fragment.
 
+`CSIAPPS_CLIENT_SECRET` is optional for a registered public PKCE client;
+confidential clients still supply it. The separate `CSIAPPS_SECRET_KEY` remains
+mandatory.
+
 `CSIAPPS_SECRET_KEY` encrypts OAuth transaction state. Generate at least 32
 random bytes, use a different key for each deployment, and keep it stable across
 restarts and replicas:
@@ -163,7 +181,7 @@ restarts and replicas:
 python -c "import secrets; print(secrets.token_urlsafe(48))"
 ```
 
-Do not commit either secret.
+Keep configured OAuth and session secrets out of source control.
 
 ## Deploying
 

@@ -79,9 +79,9 @@ server = app.server   # WSGI entrypoint for gunicorn / Posit Connect
 ```
 
 `attach()` also registers csiapps' own routes: the OAuth callback at `/redirect`,
-`/csi-auth/logout`, and the chrome stylesheet at `/csi-auth/chrome.css`. In
-production it additionally sets `Secure`/`HttpOnly`/`SameSite=Lax` on the session
-cookie and applies `ProxyFix` (Posit Connect Cloud terminates TLS upstream).
+`/csi-auth/logout`, sign-in/retry at `/csi-auth/login` and `/csi-auth/start`,
+and the chrome stylesheet at `/csi-auth/chrome.css`. In production it additionally
+sets `Secure`/`HttpOnly`/`SameSite=Lax` on the session cookie and applies `ProxyFix` (Posit Connect Cloud terminates TLS upstream).
 Calling it twice on the same app is a no-op.
 
 ### 3. `layout_wrapper()` — the CSI chrome
@@ -193,6 +193,21 @@ if __name__ == "__main__":
     app.run(debug=True, port=8050)
 ```
 
+## Session expiry and sign-in recovery
+
+In Python 0.5.1, each browser uses its own session token. A process-wide
+`CSIAPPS_ACCESS_TOKEN` does not authenticate a signed-out production browser.
+A 401, or a 403 explicitly reporting missing credentials or an invalid token,
+clears only the matching session and removes the protected app body. Callback
+responses navigate to the sign-in page, including when app code catches the
+request exception. Ordinary permission and active-profile 403 responses keep
+the browser signed in and report the API error.
+
+Logout and failed authentication offer an explicit sign-in/retry link. Keep
+app-specific caches scoped to the current user and clear them when that
+identity is lost. `token_ready()` checks token availability rather than
+performing an API validation request.
+
 ## Local development in sandbox mode
 
 The code above is written for production, but you do **not** need client
@@ -251,6 +266,10 @@ CSIAPPS_SCOPE=read write
 
 The redirect URI registered in CSIAPPS must match the deployed value exactly and
 end in `/redirect`, which is the callback route installed by `attach()`.
+
+`CSIAPPS_CLIENT_SECRET` is optional for a registered public PKCE client. A
+confidential client still supplies its secret. `CSIAPPS_SECRET_KEY` is a separate
+requirement and remains mandatory.
 
 `CSIAPPS_SECRET_KEY` signs the Flask session cookie that holds the access token.
 Generate a different key for each deployment, keep it stable across restarts and

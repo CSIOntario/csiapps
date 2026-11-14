@@ -106,6 +106,13 @@ viewer session; `quarto_setup()` safely does nothing during the render pass.
 Keep data access inside authenticated server or reactive code. Tokens,
 credentials, and data-source configuration remain server-side.
 
+With Python 0.5.1, rejected credentials clear the current viewer's authentication
+and remove the protected body; the viewer can then sign in again. Ordinary
+permission-denied responses preserve the session. Update the shared extension
+with `quarto add CSIOntario/csiapps-quarto` and re-render the document to obtain
+OAuth callback-query cleanup: `code` and `state` are removed while unrelated
+query parameters remain. App-specific caches must stay scoped to the viewer.
+
 ## Full document example
 
 The examples below produce the same organisation selector and athlete table in

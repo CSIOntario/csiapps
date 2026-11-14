@@ -133,7 +133,7 @@ Only the added import and the two call sites differ. The API client, the sandbox
 helpers, the reactive login gating, and `token_ready()` all behave exactly as
 before.
 
-## What did *not* change
+## What did not change in 0.3.0
 
 - **The core API.** `make_request`, `fetch_org_options`, `fetch_profiles`,
   `fetch_profile`, `flatten_profile`, `token_ready`, `set_institute`,
@@ -170,6 +170,28 @@ app installs `csiapps[streamlit]` and imports `page_wrapper` from
 `csiapps.streamlit`. Each app installs only its framework and none is required
 by the core. See the [Dash apps](dash-apps.md) or
 [Streamlit apps](streamlit-apps.md) tutorial.
+
+## Updating to Python 0.5.1
+
+Existing framework imports and install extras stay the same. Review these
+behavior changes when upgrading:
+
+- A production browser uses its own token exclusively. Environment tokens no
+  longer authenticate a signed-out browser; scripts and explicit sandbox
+  seeding can still use `CSIAPPS_ACCESS_TOKEN`.
+- API rejection clears only the matching session and offers sign-in again.
+  Python recognizes 401 and the API's explicit authentication-related 403
+  messages; ordinary permission and active-profile 403 responses preserve the
+  session. Logout and failed login offer manual retry. Clear app-specific
+  caches when authentication is lost and scope them to the current user.
+- Pagination raises on incomplete results instead of returning a truncated
+  list with a warning. Increase `max_pages` or handle the error explicitly.
+  Use `query={"subject": [1, 2]}` for repeated filters and
+  `retry_max_tries=1` for writes that must not be retried.
+- Public PKCE clients may omit `CSIAPPS_CLIENT_SECRET`. Dash and Streamlit
+  still require their independent `CSIAPPS_SECRET_KEY`.
+- Refresh the shared Quarto extension and re-render documents for callback
+  query cleanup. Python does not duplicate the extension's browser runtime.
 
 ## Checklist
 

@@ -23,6 +23,15 @@ To reach the **real** API you need an access token in `CSIAPPS_ACCESS_TOKEN`
 
 The simplest endpoint is `/api/csiauth/me/`, which reports the authenticated
 user. A successful response means your token is valid. Set your institute first.
+`token_ready()` only reports that a token is available; a stale token may still
+return `True` until a request rejects it.
+
+Python 0.5.1 raises `AuthenticationError` (a `RuntimeError` subclass) on 401 and
+on a 403 whose JSON `detail` is exactly `Authentication credentials were not
+provided.` or `Invalid token.`. Only a session whose own token was rejected is
+cleared. Other 403 responses, including active-profile and permission denials,
+preserve the session. Framework wrappers then offer sign-in recovery; scripts
+must obtain a valid token before retrying.
 
 | Institute value | Display name | API host |
 |---|---|---|
@@ -387,3 +396,30 @@ after the existing arguments, so existing positional calls remain compatible.
 For pagination, `max_pages` still defaults to 50; increase it when more pages
 are expected. Callers that previously accepted a truncated response must now
 handle the error or increase the limit.
+
+
+## Python request controls (0.5.1)
+
+Python list values produce repeated query parameters:
+
+```python
+pages = csiapps.make_request(
+    "api/warehouse/data-records",
+    query={"source_uuid": source_uuid, "subject": [1, 2]},
+    paginate=True,
+    sandbox=False,
+)
+```
+
+Pagination follows next links or uses count/offset when links are absent or
+null. The request raises if `max_pages` would truncate the data, a page URL
+repeats, or an empty page arrives before the advertised count is reached.
+`fetch_profiles()` uses the same behavior; callers that previously accepted a
+partial list with a warning must now handle the error or increase `max_pages`.
+
+The default retry limit is still three attempts. Pass `retry_max_tries=1` for a
+write that must not be repeated automatically. `retry_is_transient` optionally
+accepts a predicate receiving an `httpx.Response`; explicit authentication
+failures are never retried. Empty successful responses return `[]`, while empty
+HTTP error responses raise. The two retry arguments are keyword-only, preserving
+the existing positional arguments.

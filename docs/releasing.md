@@ -83,7 +83,7 @@ receive a version tag.
     ```
 
     Framework test groups skip themselves when their extra is absent; run the
-    full Shiny, Dash, and Streamlit matrix if you touched shared code.
+    full Shiny, Dash, Streamlit, and Quarto matrix if you touched shared code.
 
 ### 2. Validate against the dummy apps locally
 
@@ -114,14 +114,15 @@ receive a version tag.
 === "Python"
 
     Install the **working copy** into each dummy app (the editable install
-    overrides the pinned wheel) and run its gates. Do this for **all three**
-    frameworks — a change to shared core code must be green in each:
+    overrides the pinned wheel) and run its gates. Do this for **all four**
+    integrations — a change to shared core code must be green in each:
 
     ```bash
     # in each dummy app dir, with its own .venv active
     pip install -e '../csiapps-py[shiny]'    # dummy-python-shiny
     pip install -e '../csiapps-py[dash]'     # dummy-python-dash
     pip install -e '../csiapps-py[streamlit]' # dummy-python-streamlit
+    pip install -e '../csiapps-py[quarto]'    # dummy-python-quarto
     ```
 
     Each app's Environment panel and sandbox summary should report
@@ -134,10 +135,44 @@ receive a version tag.
 
     ```bash
     .venv/bin/python selftest.py
+    .venv/bin/python -m unittest discover -s tests -v
     ```
 
-Local validation stops here. The live suite requires real credentials and runs
-later against the deployed dummy apps in step 4.
+The sandbox suite is the required credential-free local gate. You can also
+validate the interactive app locally with real login and live API checks before
+pushing; this supplements the deployed gate in step 4.
+
+!!! info "Python: localhost does not determine authentication mode"
+    `CSIAPPS_ENV=production` enables real CSI login and live requests, even on
+    localhost. Any other value (or no value) selects sandbox, unless the app
+    explicitly overrides the mode. The Shiny, Dash, and Streamlit dummy apps
+    load `.env`; their example files select production mode. An exported value
+    takes precedence over `.env`.
+
+    For example, launch the Shiny dummy without credentials or live requests:
+
+    ```bash
+    CSIAPPS_ENV=sandbox CSIAPPS_ACCESS_TOKEN= .venv/bin/shiny run --reload --port 8000 app.py
+    ```
+
+    For optional local live validation, configure the OAuth client and its
+    exact local redirect URL, then launch:
+
+    ```bash
+    CSIAPPS_ENV=production .venv/bin/shiny run --reload --port 8000 app.py
+    ```
+
+    After login, the live board uses the browser's session token. The sandbox
+    board still uses local fixtures and must preserve that session. An active
+    browser session never falls back to `CSIAPPS_ACCESS_TOKEN`; that fallback
+    is for scripts outside a browser session. See each dummy README for its
+    framework's launch command.
+
+    The live suite includes an ingest round-trip when
+    `CSIAPPS_TEST_SOURCE_UUID` identifies the dedicated test source; without
+    it, that write check is skipped. In contrast, `python selftest.py` runs only
+    sandbox checks and does not load `.env`. CLI `--live` requires production
+    settings and a token exported into the process environment.
 
 **Green everywhere ⇒ proceed. Any red ⇒ fix `csiapps` and repeat.**
 
@@ -195,8 +230,8 @@ later against the deployed dummy apps in step 4.
 
 ### 4. Re-validate on the *deployed* dummy apps
 
-The point of this step is to catch what a local working copy can't: real OAuth,
-real data, the deployment environment, multi-request behaviour. Point the
+This step verifies real OAuth, real data, and multi-request behaviour in the
+deployment environment against the exact candidate commit. Point the
 deployed dummy apps at the unreleased code and redeploy them.
 
 === "R"
@@ -246,24 +281,29 @@ deployed dummy apps at the unreleased code and redeploy them.
 
 === "Python"
 
-    Keep each applicable dummy app permanently on **`staging`**. The canary
-    must never follow `main` or a PyPI version: `staging` is where new changes
-    are exercised before they reach either. Each canary's `requirements.txt`
-    uses its framework extra:
+    Keep each applicable dummy app tracking **`staging`**. After the package's
+    staging CI passes, its dispatch job sends the exact validated SHA to all
+    four canaries. Each canary workflow tests that SHA, updates its
+    `requirements.txt` and `manifest.json`, commits the pin, and mirrors the
+    deployment repository. Connect Cloud then rebuilds from the tracked branch.
+    The dependency is an immutable staging commit, for example:
 
     ```text
-    csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
-    csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
-    csiapps[streamlit] @ git+https://github.com/CSIOntario/csiapps-py.git@staging
+    csiapps[shiny] @ git+https://github.com/CSIOntario/csiapps-py.git@<staging-sha>
+    csiapps[dash] @ git+https://github.com/CSIOntario/csiapps-py.git@<staging-sha>
+    csiapps[streamlit] @ git+https://github.com/CSIOntario/csiapps-py.git@<staging-sha>
+    csiapps[quarto] @ git+https://github.com/CSIOntario/csiapps-py.git@<staging-sha>
     ```
 
-    Regenerate and commit the app's `manifest.json`, then push the dummy-app
-    branch tracked by Posit Connect. The manifest records app-file checksums;
-    the installed package's standard `direct_url.json` records the requested
-    ref and resolved commit.
+    The package repository needs `CSIAPPS_CANARY_TOKEN` to dispatch the canary
+    workflows. Canary repositories use `SYNC_PAT` to push their deployment
+    mirrors; it must have access to those destination repositories and permission
+    to update workflow files when those files are included in a mirrored change.
+    Check both the pin/test job and the mirror job before reviewing the apps.
 
-    For the Streamlit canary, generate native Streamlit content with `app.py` as
-    the primary file:
+    Regenerate manifests whenever app files change: they include file checksums.
+    The automated pin workflow handles dependency updates. For a manual native
+    Streamlit manifest, use `app.py` as the primary file:
 
     ```bash
     .venv/bin/rsconnect write-manifest streamlit --overwrite \
@@ -271,10 +311,10 @@ deployed dummy apps at the unreleased code and redeploy them.
     ```
 
     !!! warning "Confirm the deployed package commit"
-        Each app's Environment panel must show
-        `csiapps: <version> (staging @ <commit>)`. Match that commit to the head
-        of `csiapps-py@staging` before trusting the green boards. A version alone
-        is not enough because every staging commit can carry the same version.
+        Each app's Environment panel must show the resolved commit matching
+        `csiapps-py@staging`. The requested ref may itself be the full SHA,
+        because the workflow pins an immutable commit. A version alone is not
+        enough because multiple staging commits can carry the same version.
 
     !!! info "Host access setting"
         Enable **Public Access** on each canary's Connect Cloud content. This
@@ -353,13 +393,17 @@ the Warehouse round-trip works.
        The version was already bumped in step 3, so no source file changes here.
 
     2. **Publish the validated commit to PyPI.** There is no release workflow in
-       the repo yet, so this remains a manual tag, build, validation, and upload.
+       the repo yet. Tag the exact validated SHA and upload only its checked
+       wheel and source distribution. Prefer the `dist` artifact from that
+       commit's successful CI build; otherwise build from a clean checkout of
+       the tag. Do not upload an old `dist/*` directory containing other versions.
 
         ```bash
-        git tag v<new version> && git push --tags
-        uv build
-        uvx twine check --strict dist/*
-        uv publish
+        git tag -a v<new version> <validated-sha> -m "csiapps <new version>"
+        git push origin v<new version>
+        uv build --out-dir dist/<new version>
+        uvx twine check --strict dist/<new version>/*
+        uvx twine upload --repository pypi dist/<new version>/*
         ```
 
     3. **Update the docs** —
@@ -370,10 +414,18 @@ the Warehouse round-trip works.
        redeploys the site.
     4. **Validate the published artifact and redeploy production consumers.**
        Install `csiapps[shiny]==<new version>`, `csiapps[dash]==<new version>`,
-       and `csiapps[streamlit]==<new version>` in clean temporary environments
-       and run the corresponding dummy app's sandbox self-test from each. Then update
-       each production app deliberately. Do **not** change the dummy apps'
-       committed requirements: they stay on `staging` continuously.
+       `csiapps[streamlit]==<new version>`, and `csiapps[quarto]==<new version>`
+       in separate clean temporary environments. Run each corresponding dummy
+       app's sandbox self-test and regression tests. Confirm the installed copy
+       comes from PyPI, not an editable checkout. Create a GitHub Release with
+       notes explaining behavior changes and migration requirements.
+
+       Update each production app deliberately, after checking its imports and
+       compatibility with the new version. Keep the dummy apps' committed
+       requirements on their exact staging SHA; they continue tracking future
+       staging changes through automation. If the shared Quarto extension also
+       changed, promote its validated staging commit to `main` so
+       `quarto add CSIOntario/csiapps-quarto` obtains the updated browser bridge.
 
 ## Checklist
 
@@ -400,20 +452,20 @@ the Warehouse round-trip works.
 === "Python"
 
     - [ ] `pytest` green in `csiapps-py`.
-    - [ ] `selftest.py` (sandbox) green in **all three** dummy apps against the
-          working copy.
+    - [ ] `selftest.py` (sandbox) and `python -m unittest discover -s tests -v`
+          green in **all four** Python dummy apps against the working copy.
     - [ ] Change merged into **`csiapps-py@staging`**, not `main`.
     - [ ] Version bumped in both files before the deployed gate.
-    - [ ] Dummy-app manifest regenerated and pushed with its applicable
-          `csiapps[...] @ git+...@staging` requirement.
+    - [ ] All four canary workflows green, including deployment mirrors;
+          requirements and manifests pin the exact candidate staging SHA.
     - [ ] Deployed dummy apps green in production and showing the exact staging
           commit in their Environment panel.
     - [ ] `staging` fast-forwarded into `main`; validated commit tagged, built,
           checked, and published to PyPI.
     - [ ] Docs updated (tutorials / parity / behaviour notes).
     - [ ] Published `csiapps==<version>` artifact validated in a clean
-          environment and the pin bumped in every production app; dummy apps
-          remain on `git+...@staging`.
+          environment for all four extras; production-app migrations reviewed
+          individually. Dummy apps retain their exact staging SHA pins.
 
 ## How the two release processes differ
 
@@ -422,20 +474,20 @@ worth knowing before you run the loop in the other language:
 
 | | R | Python |
 |---|---|---|
-| Canaries | `dummy-r-shiny` | `dummy-python-shiny` + `dummy-python-dash` + `dummy-python-streamlit` |
+| Canaries | `dummy-r-shiny` + `dummy-r-quarto` | `dummy-python-shiny` + `dummy-python-dash` + `dummy-python-streamlit` + `dummy-python-quarto` |
 | Test command | `devtools::test()` / `devtools::check()` | `uv run pytest` |
 | Regenerate docs from source | `devtools::document()` commits `man/` + `NAMESPACE` | not needed — mkdocstrings reads the source |
 | Getting the working copy into the dummy app | automatic, `pkgload::load_all("../csiapps")` | `pip install -e '../csiapps-py[extra]'` |
 | Env vars for the CLI self-test | `.Renviron`, auto-loaded | must be exported in the shell |
 | Integration branch | **`staging`** | **`staging`** |
-| Deploy pin | generated `manifest.json`, pins an exact `GithubSHA1` | hand-edited `requirements.txt` line |
-| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | permanent `git+…@staging` line; manifest regenerated |
-| Publishing the deploy | `git push` the manifest; Connect Cloud rebuilds | redeploy the app |
+| Deploy pin | generated `manifest.json`, pins an exact `GithubSHA1` | automated exact staging SHA in `requirements.txt` and regenerated manifest |
+| Pre-release deploy | `deploy.R` (defaults to `staging`); nothing to revert | successful staging CI dispatches all four canaries; nothing to revert |
+| Publishing the deploy | `git push` the manifest; Connect Cloud rebuilds | pin workflow pushes and mirrors; Connect Cloud rebuilds |
 | Distribution | GitHub — no registry | PyPI |
 | Effect of merging to `main` | **publishes** to every `install_github()` consumer, and to the pkgdown site | updates source/API docs; package consumers wait for `uv publish` |
 | Version file | `DESCRIPTION` | `pyproject.toml` + `__version__` |
 | Version bumped at | step 3, on `staging` | step 3, on `staging` |
-| Release notes | GitHub Release body | tag / PyPI release notes |
+| Release notes | GitHub Release body | GitHub Release body and migration documentation |
 | Reference docs | separate [pkgdown site](https://csiontario.github.io/csiapps-r/), auto-built from `main` | [mkdocstrings](api.md), inside this site |
 
 !!! question "Why does Python use `staging` when PyPI is already a gate?"
