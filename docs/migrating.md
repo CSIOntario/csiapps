@@ -190,6 +190,9 @@ behavior changes when upgrading:
   `retry_max_tries=1` for writes that must not be retried.
 - Public PKCE clients may omit `CSIAPPS_CLIENT_SECRET`. Dash and Streamlit
   still require their independent `CSIAPPS_SECRET_KEY`.
+- Shiny and Quarto login supports Shiny 1.9's concurrent reactive effects.
+  Signing out also discards a token exchange that is still in flight, so a late
+  response cannot sign the viewer back in.
 - Refresh the shared Quarto extension and re-render documents for callback
   query cleanup. Python does not duplicate the extension's browser runtime.
 

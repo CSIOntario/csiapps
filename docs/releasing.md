@@ -84,6 +84,11 @@ receive a version tag.
 
     Framework test groups skip themselves when their extra is absent; run the
     full Shiny, Dash, Streamlit, and Quarto matrix if you touched shared code.
+    Test clean installs on the deployment Python version as well as an existing
+    development environment: an editable install can retain older dependencies.
+    Shiny CI covers 1.6.3 and the latest version on Python 3.11; Quarto also tests
+    the latest version on Python 3.11. Shiny 1.9 runs asynchronous reactive effects
+    concurrently, so authentication checks must not depend on effect order.
 
 ### 2. Validate against the dummy apps locally
 
