@@ -143,6 +143,12 @@ receive a version tag.
     .venv/bin/python -m unittest discover -s tests -v
     ```
 
+    Also validate the built wheel in clean environments with each applicable
+    extra and the deployment Python version before the deployed review. An
+    editable environment can retain older dependencies and hide a compatibility
+    issue. Run these checks once per candidate artifact; repeat them when the
+    candidate, its dependencies, or an unresolved failure changes.
+
 The sandbox suite is the required credential-free local gate. You can also
 validate the interactive app locally with real login and live API checks before
 pushing; this supplements the deployed gate in step 4.
@@ -411,6 +417,14 @@ the Warehouse round-trip works.
         uvx twine upload --repository pypi dist/<new version>/*
         ```
 
+       `twine check` validates distribution metadata; `twine upload` sends the
+       files to PyPI and asks for credentials if needed. Neither command runs
+       application tests. The full test matrix belongs to the earlier validation
+       steps; it does not need to run again merely because you are uploading the
+       same checked files. A custom release helper may bundle tests, branch/tag
+       updates, uploads, and documentation deployment, so list its phases before
+       running it and show which phase is active.
+
     3. **Update the docs** —
        [`csiapps`](https://github.com/CSIOntario/csiapps), the repo behind this
        site: the [Python reference](api.md) autodocs from `csiapps-py@main`, but
@@ -420,10 +434,14 @@ the Warehouse round-trip works.
     4. **Validate the published artifact and redeploy production consumers.**
        Install `csiapps[shiny]==<new version>`, `csiapps[dash]==<new version>`,
        `csiapps[streamlit]==<new version>`, and `csiapps[quarto]==<new version>`
-       in separate clean temporary environments. Run each corresponding dummy
-       app's sandbox self-test and regression tests. Confirm the installed copy
-       comes from PyPI, not an editable checkout. Create a GitHub Release with
-       notes explaining behavior changes and migration requirements.
+       in separate clean temporary environments. Verify that PyPI's distribution
+       hashes match the checked files, then run each corresponding dummy app's
+       sandbox self-test and regression tests. Confirm the installed copy comes
+       from PyPI, not an editable checkout. A wheel test copy needs a requirement
+       matching that wheel or PyPI version; keep the real canary's Git pin intact
+       so its provenance check continues to detect an incorrect deployment.
+       Create a GitHub Release with notes explaining behavior changes and
+       migration requirements, and update this site's [release notes](release-notes.md).
 
        Update each production app deliberately, after checking its imports and
        compatibility with the new version. Keep the dummy apps' committed

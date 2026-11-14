@@ -5,8 +5,10 @@ packages — [R](https://github.com/CSIOntario/csiapps-r) and
 [Python](https://github.com/CSIOntario/csiapps-py) — built with
 [MkDocs Material](https://squidfunk.github.io/mkdocs-material/).
 
-It covers the shared warehouse/sandbox API and the Shiny, Dash, and Streamlit
-application wrappers available in the applicable language.
+It covers the shared warehouse/sandbox API, Shiny, Dash, and Streamlit
+application wrappers, and authenticated Quarto documents. Published behavior
+changes are summarized in `docs/release-notes.md`; upgrade guidance is in
+`docs/migrating.md`.
 
 **Live site: https://csiontario.github.io/csiapps/**
 
@@ -18,6 +20,7 @@ The R reference lives with the R package (pkgdown, at `…/csiapps-r/`).
 
 ```bash
 pip install -r requirements.txt
+mkdocs build --strict # check links, reference generation, and documentation warnings
 mkdocs serve          # preview at http://127.0.0.1:8000
 ```
 

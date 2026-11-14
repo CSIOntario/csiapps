@@ -5,9 +5,9 @@ Python versions of `csiapps`. Each row is a capability; the R and Python columns
 give the function(s) that provide it. An empty cell marks a capability that
 exists in only one language (see the notes below for why).
 
-The two packages have **full feature parity** — every capability is available in
-both — with two exceptions that are intentional and explained under
-[Intentional divergences](#intentional-divergences).
+The packages provide corresponding core API and sandbox capabilities. Framework
+coverage, helper functions, and some authentication behavior differ as recorded
+below and under [Intentional divergences](#intentional-divergences).
 
 ## Configuration
 
@@ -93,9 +93,10 @@ concrete reason:
   one profile into scalar fields for a table. R users flatten inline with
   `data.frame()` / `do.call(rbind, ...)`, so no dedicated helper ships in R.
 - **Python splits the framework wrappers into a submodule + optional extra.**
-  Since Python 0.3.0 the wrappers live in `csiapps.shiny` (Shiny) and
-  `csiapps.dash` (Dash), and `csiapps.streamlit` (Streamlit), each behind its
-  own extra (`csiapps[shiny]` / `csiapps[dash]` / `csiapps[streamlit]`); the
+  The optional-framework split began in Python 0.3.0. Current wrappers live in
+  `csiapps.shiny` (Shiny), `csiapps.dash` (Dash), `csiapps.streamlit` (Streamlit), and
+  `csiapps.quarto` (Quarto), each behind its own extra (`csiapps[shiny]` /
+  `csiapps[dash]` / `csiapps[streamlit]` / `csiapps[quarto]`); the
   core imports no web framework. R keeps `ui_wrapper()` /
   `server_wrapper()` on the package namespace, since R has no equivalent notion of
   optional install extras. See [Migrating Python apps](migrating.md).
@@ -134,7 +135,7 @@ deliberate hardening — same capability, adapted shape:
   shim, as it never wrote the token to the environment. See
   [Authentication and data access](shiny-apps.md#authentication-and-data-access).
 
-## R 0.2.1 request compatibility
+## Request compatibility: R 0.2.1 and Python 0.5.1 {#r-021-request-compatibility}
 
 R 0.2.1 adds `query_multi`, `retry_max_tries` and
 `retry_is_transient` options to `make_request()`. It supports count/offset

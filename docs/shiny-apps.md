@@ -217,6 +217,11 @@ session signed in. `token_ready()` reports token availability; it does not
 validate that token with the API. Apps should gate protected outputs on
 `token_ready()` and clear cached data when authentication is lost.
 
+Python 0.5.1 supports Shiny 1.9's concurrent asynchronous effects: successful
+login stores the session token before publishing the login result, and a token
+exchange completing after sign-out is discarded. This also applies to the
+Python Quarto wrapper. Existing Shiny 1.6.3 integrations remain supported.
+
 Public OAuth PKCE clients may omit `CSIAPPS_CLIENT_SECRET`. A confidential client
 still supplies its configured secret.
 
